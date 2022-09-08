@@ -60,7 +60,7 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
 
 End Function
 
-Public Function Intensity_AFDRS(ByVal ROS As Double, ByVal DF As Single, ByVal flame_h As Single) As Long
+Public Function Intensity_forest_AFDRS(ByVal ROS As Double, ByVal DF As Single, ByVal flame_h As Single) As Long
     'calculate the intensity based on fuel load and ROS
     'note AFDRS caps surface fuel load at 10 t/ha (1 kg/m)
     'Args:
@@ -89,15 +89,22 @@ Public Function Intensity_AFDRS(ByVal ROS As Double, ByVal DF As Single, ByVal f
         fuel_load = fuel_load + fl_e
     End If
     fuel_load = fuel_load * fuel_avail
+        
+    'Intensity_forest_AFDRS = fuel_load
+    Intensity_forest_AFDRS = Intensity_AFDRS(ROS, fuel_load)
+End Function
+Public Function Intensity_AFDRS(ByVal ROS As Double, ByVal fuel_load As Single) As Long
+    'calculates the fireline intensity (kW/m) based on Byram 1959
+    'args:
+    '  ROS: forward rate of spread (km/h)
+    '  fuel_load: dine fuel load (t/ha)
     
     'convert units
     ROS = ROS / 3600 'm/s
     fuel_load = fuel_load / 10 'kg/m^2
     
-    'Intensity_AFDRS = fuel_load
     Intensity_AFDRS = 18600 * ROS * fuel_load
 End Function
-
 Public Function Flame_Height_AFDRS(ByVal ROS As Double) As Single
     'calculate the flame height
     'Args:
@@ -144,7 +151,7 @@ Public Function ROS_Forest_AFDRS( _
     ROS_Forest_AFDRS = ROS_Forest_AFDRS * Mf
     
 End Function
-Public Function FMC_AFDRS(ByVal temp As Single, ByVal rh As Single, ByVal this_date As Date, ByVal time As Date) As Single
+Public Function FMC_Forest(ByVal temp As Single, ByVal rh As Single, ByVal this_date As Date, ByVal time As Date) As Single
     'Calculate the fine fuel moisture content
     'Args:
     '  temp: air temperature (C)
@@ -165,11 +172,11 @@ Public Function FMC_AFDRS(ByVal temp As Single, ByVal rh As Single, ByVal this_d
     
     If (Month(this_date) >= start_peak_month Or Month(this_date) <= end_peak_month) And _
         (Hour(time) >= start_afternoon And Hour(time) <= end_afternoon) Then
-        FMC_AFDRS = 2.76 + 0.124 * rh - 0.0187 * temp
+        FMC_Forest = 2.76 + 0.124 * rh - 0.0187 * temp
     ElseIf Hour(time) <= sunrise Or Hour(time) >= sunset Then
-        FMC_AFDRS = 3.08 + 0.198 * rh - 0.0483 * temp
+        FMC_Forest = 3.08 + 0.198 * rh - 0.0483 * temp
     Else
-        FMC_AFDRS = 3.6 + 0.169 * rh - 0.045 * temp
+        FMC_Forest = 3.6 + 0.169 * rh - 0.045 * temp
     End If
     
     'Mf_AFDRS = Month(this_date)
@@ -196,6 +203,74 @@ Public Function Spotting_Dist(ByVal ROS As Single, ByVal wind_speed As Single) A
     
     Spotting_Dist = Abs(176.969 * Atn(fha_s) * (ROS / (wind_speed ^ 0.25)) ^ 0.5 + 1568800 * fhs_s ^ -1 * (ROS / (wind_speed ^ 0.25)) ^ -1.5 - 3015.09)
     
+End Function
+Public Function FMC_Grass(ByVal temp As Single, ByVal rh As Single) As Single
+    'calculate the grass fuel moisture content as % based on McArthur (1966)
+    'args:
+    '  temp: air temperature (C)
+    '  rh: relative humidity (%)
+    
+    FMC_Grass = 9.58 - 0.205 * temp + 0.138 * rh
+End Function
+Public Function ROS_Grass_AFDRS( _
+    ByVal wind_speed As Single, ByVal fmc As Single, ByVal curing As Single, ByVal state As String _
+    ) As Integer
+    'calculate the forward ROS (m/h) ignoring slope
+    'Args:
+    '  wind_speed - 10 m wind speed (km/h)
+    '  fmc - fuel moisture content (%)
+    '  curing - degree of grass curing (%)
+    '  state - grass state
+    
+    Dim moist_coeff, curing_coeff As Single
+    
+    curing_coeff = curing_coeff_grass(curing)
+    moist_coeff = moist_coeff_grass(fmc)
+    
+    Select Case state
+        Case "natural"
+            If wind_speed < 5 Then
+                ROS_Grass_AFDRS = 0.054 + 0.269 * wind_speed
+            Else
+                ROS_Grass_AFDRS = 1.4 + 0.838 * (wind_speed - 5) ^ 0.844
+            End If
+        Case "grazed"
+            If wind_speed < 5 Then
+                ROS_Grass_AFDRS = 0.054 + 0.209 * wind_speed
+            Else
+                ROS_Grass_AFDRS = 1.1 + 0.715 * (wind_speed - 5) ^ 0.844
+            End If
+        Case "eaten-out"
+            If wind_speed < 5 Then
+                ROS_Grass_AFDRS = 0.054 + 0.209 * wind_speed
+            Else
+                ROS_Grass_AFDRS = 0.55 + 0.357 * (wind_speed - 5) ^ 0.844
+            End If
+    End Select
+    
+    ROS_Grass_AFDRS = ROS_Grass_AFDRS * 1000 * moist_coeff * curing_coeff
+    
+End Function
+Public Function curing_coeff_grass(ByVal curing As Single) As Single
+    'calculate the curing coefficient based on Cruz et al. (2015)
+    'args:
+    '  curing - degree of grass curing (%)
+    
+    curing_coeff_grass = 1.036 / (1 + 103.989 * Exp(-0.0996 * (curing - 20)))
+End Function
+Public Function moist_coeff_grass(ByVal fmc As Single) As Single
+    'calculate the grass moisture coefficient
+    'args:
+    '  fmc - fuel moisture content (%)
+    If fmc < 12 Then
+        moist_coeff_grass = Exp(-0.108 * fmc)
+    Else
+        If windspeed <= 10 Then
+            moist_coeff_grass = 0.684 - 0.0342 * fmc
+        Else
+            moist_coeff_grass = 0.547 - 0.228 * fmc
+        End If
+    End If
 End Function
 Public Function test() As Single
     test = Mf_AFDRS()
