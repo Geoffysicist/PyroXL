@@ -272,6 +272,26 @@ Public Function moist_coeff_grass(ByVal fmc As Single) As Single
         End If
     End If
 End Function
+Public Function Flame_H_Grass(ByVal ROS As Single) As Single
+    'calculate the flame height (m) based on M. Plucinski, pers. comm.
+    'args:
+    '  ROS: forward rate of spread (m/h)
+    
+    Dim state As String: state = Range("state_grass").Value
+    
+    'adjust units to km/h
+    ROS = ROS / 1000 / 3.6
+    
+    Select Case state
+        Case "natural"
+            Flame_H_Grass = 2.66 * ROS ^ 0.295
+        Case "grazed"
+            Flame_H_Grass = 1.12 * ROS ^ 0.295
+        Case "eaten-out"
+            Flame_H_Grass = 1.12 * ROS ^ 0.295
+    End Select
+    
+End Function
 Public Function test() As Single
     test = Mf_AFDRS()
 End Function
