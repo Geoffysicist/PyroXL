@@ -60,7 +60,10 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
 
 End Function
 
-Public Function Intensity_forest_AFDRS(ByVal ROS As Double, ByVal DF As Single, ByVal flame_h As Single) As Long
+Public Function Intensity_forest_AFDRS( _
+    ByVal ROS As Double, ByVal DF, flame_h As Double, _
+    ByVal fl_s, fl_ns, fl_e, fl_b, fl_o, h_o As Single _
+    ) As Long
     'calculate the intensity based on fuel load and ROS
     'note AFDRS caps surface fuel load at 10 t/ha (1 kg/m)
     'Args:
@@ -69,16 +72,10 @@ Public Function Intensity_forest_AFDRS(ByVal ROS As Double, ByVal DF As Single, 
     '  flame_h: flame height (m)
        
     Dim fuel_avail As Single
-    Dim fl_s, fl_ns, fl_e, fl_b As Integer 'fuel loads: s surface, ns near surface, e elevated, b bark
     Dim fuel_load As Single
     Dim flame_h_elev As Single: flame_h_elev = 1 'm
     Dim flame_h_crown_frac As Single: flame_h_crown_frac = 0.66 'dimensionless
     fuel_avail = DF * 0.1
-    
-    fl_s = Range("fl_s").Value
-    fl_ns = Range("fl_ns").Value
-    fl_e = Range("fl_e").Value
-    fl_b = Range("fl_b").Value
     
     'cap surface fuel load
     fl_s = WorksheetFunction.Min(10, fl_s)
@@ -87,6 +84,9 @@ Public Function Intensity_forest_AFDRS(ByVal ROS As Double, ByVal DF As Single, 
     fuel_load = fl_s + fl_ns
     If flame_h > flame_h_elev Then
         fuel_load = fuel_load + fl_e
+    End If
+    If flame_h > (h_o * flame_h_crown_frac) Then
+        fuel_load = fuel_load + 0.5 * fl_o
     End If
     fuel_load = fuel_load * fuel_avail
         
@@ -105,44 +105,45 @@ Public Function Intensity_AFDRS(ByVal ROS As Double, ByVal fuel_load As Single) 
     
     Intensity_AFDRS = 18600 * ROS * fuel_load
 End Function
-Public Function Flame_Height_AFDRS(ByVal ROS As Double) As Single
+Public Function Flame_Height_AFDRS( _
+    ByVal ROS As Double, ByVal fh_e As Single _
+    ) As Single
     'calculate the flame height
     'Args:
-    '  ROS - forward rate of spread m/h
+    '  ROS - forward rate of spread (m/h)
+    '  fh_e - elevated fuel height (m)
     
-    Dim fh_e As Single 'flame height elevated fuel m
-    fh_e = Range("fh_e").Value
+    'Dim fh_e As Single 'flame height elevated fuel m
+    'fh_e = Range("fh_e").Value
     
     Flame_Height_AFDRS = 0.0193 * ROS ^ 0.723 * Exp(fh_e * 0.64) * 1.07
     
 End Function
-
 Public Function ROS_Forest_AFDRS( _
-    ByVal wind_speed As Single, ByVal fmc As Single, Optional ByVal WAF As Single = 3 _
+    ByVal wind_speed, fhs_s, fhs_ns, h_ns, fmc, DF, WAF As Single _
     ) As Integer
     'calculate the forward ROS (m/h) ignoring slope
     'Args:
     '  wind_speed - 10 m wind speed (km/h)
     '  fmc - fuel moisture content (%)
-    '  WAF - wind adjustment factor default = 3
+    '
     
-    Dim wind_threshold As Integer: wind_threshold = 5
-
-    Dim fhs_s As Single 'fuel hazard score surface
-    Dim fhs_ns As Single 'fuel hazard score near surface
-    Dim fh_ns As Single 'fuel height near surface (m)
+    Dim wind_threshold As Single: wind_threshold = 5
+    Dim fuel_avail As Single: fuel_avail = DF * 0.1
+    
     Dim Mf As Single 'moisture function
-    fhs_s = Range("fhs_s").Value
-    fhs_ns = Range("fhs_ns").Value
-    fh_ns = Range("fh_ns").Value
     Mf = Mf_AFDRS(fmc)
     
+    'modify fuel parameters with fuel availability
+    fhs_s = fhs_s * fuel_avail
+    fhs_ns = fhs_ns * fuel_avail
+    
     'apply wind reduction factor
-    wind_speed = wind_speed * 3 / WAF
+    wind_speed = wind_speed * 3# / WAF
     
     'calculate ROS for 7% moisture
     If wind_speed > wind_threshold Then
-        ROS_Forest_AFDRS = 30 + 1.5308 * (wind_speed - 5) ^ 0.8576 * fhs_s ^ 0.9301 * (fhs_ns * fh_ns) ^ 0.6366 * 1.03
+        ROS_Forest_AFDRS = 30 + 1.5308 * (wind_speed - wind_threshold) ^ 0.8576 * fhs_s ^ 0.9301 * (fhs_ns * h_ns) ^ 0.6366 * 1.03
     Else
         ROS_Forest_AFDRS = 30
     End If
@@ -192,16 +193,16 @@ Public Function Mf_AFDRS(ByVal fmc As Single) As Single
         Mf_AFDRS = 18.35 * fmc ^ -1.495
     End If
 End Function
-Public Function Spotting_Dist(ByVal ROS As Single, ByVal wind_speed As Single) As Integer
+Public Function Forest_spotting( _
+    ByVal ROS, wind_speed, fhs_s As Single _
+    ) As Integer
     'calculates the spotting distance in m
     'args:
     '  ROS: forward rate of spread (m/h)
     '  wind_speed: 10m wind speed (km/h)
+    '  fhs_s: fuel hazard score surface
     
-    Dim fhs_s As Single 'fuel hazard score surface
-    fhs_s = Range("fhs_s").Value
-    
-    Spotting_Dist = Abs(176.969 * Atn(fha_s) * (ROS / (wind_speed ^ 0.25)) ^ 0.5 + 1568800 * fhs_s ^ -1 * (ROS / (wind_speed ^ 0.25)) ^ -1.5 - 3015.09)
+    Forest_spotting = Abs(176.969 * Atn(fhs_s) * (ROS / (wind_speed ^ 0.25)) ^ 0.5 + 1568800 * fhs_s ^ -1 * (ROS / (wind_speed ^ 0.25)) ^ -1.5 - 3015.09)
     
 End Function
 Public Function FMC_Grass(ByVal temp As Single, ByVal rh As Single) As Single
