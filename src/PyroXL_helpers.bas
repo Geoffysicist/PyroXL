@@ -1,43 +1,24 @@
 Attribute VB_Name = "PyroXL_helpers"
-Public Sub Copy_formulae()
-    'Copies the output formulae down to match input data rows
-    '
-    '
-    ActiveSheet.Unprotect
-    Application.Calculation = xlCalculationManual
-
-    Dim _weather As Range
-    Dim _outputs As Range
-    Set _weather = ActiveSheet.Range("weather", ActiveSheet.Range("weather").End(xlDown))
-    Set _outputs = ActiveSheet.Range("outputs", ActiveSheet.Range("outputs").End(xlDown))
-    
-    Dim weather_rows As Integer: weather_rows = _weather.Rows.Count
-    Dim output_rows As Integer: output_rows = _outputs.Rows.Count
-    If Not weather_rows = output_rows Then
-        _outputs.Offset(1,).ClearContents
-        _outputs.Resize(weather_rows, ).FillDown
-        '_outputs.Offset(1,).Select
-        'Selection.ClearContents
-        '_outputs.Resize(weather_rows, ).Select
-        'Selection.FillDown
-    End If
-    Application.Calculation = xlCalculationAutomatic
-    ActiveSheet.Protect
-End Sub
-
-Public Sub trim_output(input, output As Range)
+Public Sub trim_output(input_row1, output_row1 As Range)
     'Trims or extends the output rows to match input rows
-    
-    ActiveSheet.Unprotect
-    Application.Calculation = xlCalculationManual
-    
-    Dim input_rows As Integer: input_rows = input.Rows.Count
-    Dim output_rows As Integer: output_rows = output.Rows.Count
-    If Not input_rows = output_rows Then
-        output.Offset(1,).ClearContents
-        output.Resize(input_rows, ).FillDown
+    'args:
+    '  input_row1: the first row of the input data
+    '  output_row1: the first row of the output
+    Dim input_range, output_range As Range
+    Set input_range = Range(input_row1, input_row1.End(xlDown))
+    Set output_range = Range(output_row1, output_row1.End(xlDown))
+    'Dim output_rows As Integer: output_rows = output.Rows.Count
+    If Not input_range.Rows.Count = output_range.Rows.Count Then
+        'MsgBox "unequal"
+        output_range.Resize(output_range.Rows.Count - 1).Offset(1, 0).ClearContents
+        'avoid filling all the way to the bottom if only one row of input
+        If WorksheetFunction.CountA(input_range) > 1 Then
+            output_range.Resize(input_range.Rows.Count).FillDown
+        End If
     End If
-    Application.Calculation = xlCalculationAutomatic
-    ActiveSheet.Protect
+
 End Sub
 
+Public Sub test()
+    Call trim_output(Range("A2:B2"), Range("C2:D2"))
+End Sub
