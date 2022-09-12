@@ -1,5 +1,5 @@
 Attribute VB_Name = "AFDRS_General"
-Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest") As Integer
+Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Integer
     ' returns FBI.
     'args
     '  intensity: file line intensity (kW/m)
@@ -36,7 +36,7 @@ Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest
     End Select
     
     'determine FBI
-    Select Case Intensity
+    Select Case intensity
         Case Is < intensity_b(0)
             FBI = -9999
             Exit Function
@@ -47,7 +47,7 @@ Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest
             fbi_la = fbi_b(UBound(fbi_b))
         Case Else
             For i = 1 To UBound(intensity_b)
-                If Intensity < intensity_b(i) Then
+                If intensity < intensity_b(i) Then
                     fbi_la = fbi_b(i - 1)
                     fbi_ua = fbi_b(i)
                     intensity_la = intensity_b(i - 1)
@@ -57,11 +57,11 @@ Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest
             Next i
     End Select
     
-    FBI = fbi_la + (fbi_ua - fbi_la) * (Intensity - intensity_la) / (intensity_ua - intensity_la)
+    FBI = fbi_la + (fbi_ua - fbi_la) * (intensity - intensity_la) / (intensity_ua - intensity_la)
 
 End Function
 
-Public Function Intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Long
+Public Function intensity(ByVal ROS As Double, ByVal Fuel_load As Single) As Long
     'calculates the fireline intensity (kW/m) based on Byram 1959
     'args:
     '  ROS: forward rate of spread (km/h)
@@ -69,7 +69,17 @@ Public Function Intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Lon
     
     'convert units
     ROS = ROS / 3600 'm/s
-    fuel_load = fuel_load / 10 'kg/m^2
+    Fuel_load = Fuel_load / 10 'kg/m^2
     
-    Intensity = 18600 * ROS * fuel_load
+    intensity = 18600 * ROS * Fuel_load
+End Function
+
+Public Function Fuel_load(fl_max, tsf, k) As Integer
+    'returns the fuel load (t/ha) based on time since fire and fuel accumulation curve parameter
+    'args
+    '  fl_max: the steady state fuel load (t/ha)
+    '  tsf: time since fire (y)
+    '  k: fuel accumulation curve parameter
+    
+    Fuel_load = fl_max * (1 - Exp(-1 * tsf * k))
 End Function

@@ -13,7 +13,7 @@ Public Function Intensity_forest(ROS, DF, flame_h As Double, fl_s, fl_ns, fl_e, 
     '  h_o: overstorey (canopy) height (m)
        
     Dim fuel_avail As Single
-    Dim fuel_load As Single
+    Dim Fuel_load As Single
     Dim flame_h_elev As Single: flame_h_elev = 1 'm
     Dim flame_h_crown_frac As Single: flame_h_crown_frac = 0.66 'dimensionless
     fuel_avail = DF * 0.1
@@ -22,16 +22,16 @@ Public Function Intensity_forest(ROS, DF, flame_h As Double, fl_s, fl_ns, fl_e, 
     fl_s = WorksheetFunction.Min(10, fl_s)
     
     'accumulate fuel load based on flame height
-    fuel_load = fl_s + fl_ns
+    Fuel_load = fl_s + fl_ns
     If flame_h > flame_h_elev Then
-        fuel_load = fuel_load + fl_e
+        Fuel_load = Fuel_load + fl_e
     End If
     If flame_h > (h_o * flame_h_crown_frac) Then
-        fuel_load = fuel_load + 0.5 * fl_o
+        Fuel_load = Fuel_load + 0.5 * fl_o
     End If
-    fuel_load = fuel_load * fuel_avail
+    Fuel_load = Fuel_load * fuel_avail
         
-    Intensity_forest = Intensity(ROS, fuel_load)
+    Intensity_forest = intensity(ROS, Fuel_load)
 End Function
 
 Public Function Flame_height_forest(ROS As Double, fh_e As Single) As Single
