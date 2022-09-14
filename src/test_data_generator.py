@@ -1,12 +1,15 @@
 '''test_data_generator.py
 
-generates input data for a range of variables given max, min and step
-values
+generates input data as csv file for a range of parameters given max, 
+min and step for each parameter.
+
+The output csv file contains all unique combinations (cartesian product)
+of the input parameters
 '''
 import numpy as np
 import pandas as pd
 
-# param dictionary - 'parameter_name': (min, max, step)
+# parameter dictionary - 'parameter_name': (min, max, step)
 param_dict = {
     'param1': (1,4,1),
     'param2': (0,6,2),
@@ -20,9 +23,10 @@ def cartesian(arrays, out=None):
     """
     Generate a cartesian product of input arrays.
 
-    recursively builds the final array
+    Fecursively builds the final array. 
+    Final array contains all unique combinations from input arrays
 
-    args
+    Args
         arrays : list of array-like 1-D arrays
         out : ndarray to place the cartesian product in.
 
@@ -47,10 +51,10 @@ def cartesian(arrays, out=None):
            [3, 5, 7]])
     """
 
-    arrays = [np.asarray(x) for x in arrays]
+    arrays = [np.asarray(a) for a in arrays]
     dtype = arrays[0].dtype
 
-    n = np.prod([x.size for x in arrays])
+    n = np.prod([a.size for a in arrays])
     if out is None:
         out = np.zeros([n, len(arrays)], dtype=dtype)
 
@@ -60,7 +64,6 @@ def cartesian(arrays, out=None):
     if arrays[1:]:
         cartesian(arrays[1:], out=out[0:m, 1:])
         for j in range(1, arrays[0].size):
-        #for j in xrange(1, arrays[0].size):
             out[j*m:(j+1)*m, 1:] = out[0:m, 1:]
     return out
 
