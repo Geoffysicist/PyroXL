@@ -1,5 +1,6 @@
 Attribute VB_Name = "AFDRS_General"
-Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Integer
+Public Function FBI(ByVal intensity As Long, Optional fuel As String = "forest") As Single
+
     ' returns FBI.
     'args
     '  intensity: file line intensity (kW/m)
@@ -58,6 +59,7 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
     End Select
     
     FBI = fbi_la + (fbi_ua - fbi_la) * (intensity - intensity_la) / (intensity_ua - intensity_la)
+    FBI = Int(FBI) 'FBI needs to be truncated for National consistency
 
 End Function
 

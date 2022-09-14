@@ -18,7 +18,14 @@ Public Sub trim_output(input_row1, output_row1 As Range)
     End If
 
 End Sub
+Public Function Power(coefficient, exponent) As Double
+    'returns the coefficient raised to the power of the exponent
+    'to make life easier translating python :)
+
+    Power = coefficient ^ exponent
+End Function
+
 
 Public Sub test()
-    Call trim_output(Range("A2:B2"), Range("C2:D2"))
+    MsgBox Power(2, 3)
 End Sub
