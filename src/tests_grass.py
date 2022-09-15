@@ -1,26 +1,6 @@
 from spread_models import csiro_grassland as grass
 import test_data_generator as tdg
 
-# dictionary for datetime inputs - 'parameter_name': (start, stop, date_step, time_step)
-# date format must be iso1806 (YYYY-MM-DD or YYYY-MM-DDTHH:MM
-# date_step is days
-# time_step is hours
-datetime_param_dict = {
-    'date': ('2022-01-01', '2022-09-01', 90, 12),
-}
-
-# dictionary for numerical inputs - 'parameter_name': (min, max, step)
-num_param_dict = {
-    'num_param1': (1,4,1),
-    'num_param2': (0,1,0.3),
-}
-
-# dictionary for categorical inputs - 'parameter_name': (class1, class2...classn)
-class_param_dict = {
-    'class_param1': ('foo','bar'),
-    'class_param2': (-1,0,99),
-}
-
 # #grass fuel moist content
 # datetime_param_dict = {}
 

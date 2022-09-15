@@ -1,45 +1,36 @@
 '''test_data_generator.py
-
-generates input data as csv file for a range of parameters
-
-The output csv file contains all unique combinations (cartesian product)
-of the input parameters.
-
-note that cartesian product arrays grow exponetially. For example, 
-if there are 5 parameters each with 8 increments, the resultant array will
-be 8^5 x 5or 32768 x5
-
-If you want to use irregular increments to test boundary conditions add
-them to the categorical data
 '''
 import numpy as np
 import pandas as pd
 from datetime import date, time, timedelta
 
-# dictionary for datetime inputs - 'parameter_name': (start, stop, date_step, time_step)
-# date format must be iso1806 (YYYY-MM-DD or YYYY-MM-DDTHH:MM
-# date_step is days
-# time_step is hours
-datetime_param_dict = {
-    'date': ('2022-01-01', '2022-09-01', 90, 12),
-}
-
-# dictionary for numerical inputs - 'parameter_name': (min, max, step)
-num_param_dict = {
-    'num_param1': (1,4,1),
-    'num_param2': (0,1,0.3),
-}
-
-# dictionary for categorical inputs - 'parameter_name': (class1, class2...classn)
-class_param_dict = {
-    'class_param1': ('foo','bar'),
-    'class_param2': (-1,0,99),
-}
-
-# output filename
-filename = "test_data.csv"
-
 def generate_test_data(datetime_param_dict, num_param_dict, class_param_dict):
+    """generates test data for a range of parameters
+
+    The output contains all unique combinations (cartesian product)
+    of the input parameters.
+
+    note that cartesian product arrays grow exponetially. For example, 
+    if there are 5 parameters each with 8 increments, the resultant array will
+    be 8^5 x 5or 32768 x5
+
+    If you want to use irregular increments to test boundary conditions add
+    them to the categorical data
+
+    Args:
+        datetime_param_dict (Dict): datetime parameters
+            'parameter_name': (start, stop, date_step, time_step)
+            date format must be iso1806 (YYYY-MM-DD or YYYY-MM-DDTHH:MM
+            date_step is days
+            time_step is hours
+        num_param_dict (Dict): numerical parameters
+            'parameter_name': (min, max, step)
+        class_param_dict (Dict): categorical parameter
+            'parameter_name': (class1, class2...classn)
+
+    Returns:
+        Dataframe
+    """
     header_list = []
     array_list = []
 
@@ -91,7 +82,7 @@ def cartesian(arrays, out=None):
     Fecursively builds the final array. 
     Final array contains all unique combinations from input arrays
 
-    Args
+    Args:
         arrays : list of array-like 1-D arrays
         out : ndarray to place the cartesian product in.
 
@@ -121,7 +112,6 @@ def cartesian(arrays, out=None):
 
     n = np.prod([a.size for a in arrays])
     if out is None:
-        # out = np.zeros([n, len(arrays)], dtype=dtype)
         out = np.zeros([n, len(arrays)])
 
     m = int(n / arrays[0].size) 
@@ -133,5 +123,27 @@ def cartesian(arrays, out=None):
     return out
 
 if __name__ == "__main__":
+    # dictionary for datetime inputs - 'parameter_name': (start, stop, date_step, time_step)
+    # date format must be iso1806 (YYYY-MM-DD or YYYY-MM-DDTHH:MM
+    # date_step is days
+    # time_step is hours
+    datetime_param_dict = {
+        'date': ('2022-01-01', '2022-09-01', 90, 12),
+    }
+
+    # dictionary for numerical inputs - 'parameter_name': (min, max, step)
+    num_param_dict = {
+        'num_param1': (1,4,1),
+        'num_param2': (0,1,0.3),
+    }
+
+    # dictionary for categorical inputs - 'parameter_name': (class1, class2...classn)
+    class_param_dict = {
+        'class_param1': ('foo','bar'),
+        'class_param2': (-1,0,99),
+    }
+
+    # output filename
+    filename = "test_data.csv"
     df = generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
     df.to_csv(filename, index=False)
