@@ -50,25 +50,26 @@ df.to_csv('pine_fuel_avail.csv', index=False)
 # print(df.head())
 # df.to_csv('grass_moist_coeff.csv', index=False)
 
-# # pine ROS
-# datetime_param_dict = {}
+# pine fire behaviour
+datetime_param_dict = {}
 
-# num_param_dict = {
-#     'U_10': (0,70,10),
-#     'fmc': (0,90,10),
-#     'H_el': (0,4,0.5)
-# }
+num_param_dict = {
+    'U_10': (0,70,10),
+    'fmc': (0,30,10),
+    'DF': (0,10,2),
+    'KBDI': (0,200,20)
+}
 
-# class_param_dict = {
-#     # 'overstorey': ('true', 'false')
-#     'wrf': (0.35, 0.667)
-# }
+class_param_dict = {
+}
 
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['ROS'] = heath.calc_rate_of_spread(df.wrf, df.U_10, df.H_el,df.fmc)
+tsf = None #this is a zombie parameter in the code
 
-# print(df.head())
-# df.to_csv('heath_ROS.csv', index=False)
+df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
+fire_behaviour = pine.calc_fire_spread_single(df.fmc, df.U_10, df.DF,df.KBDI,tsf)
+df['ROS'], df['intensity'], df['flame_h'] = fire_behaviour
+print(df.head())
+df.to_csv('pine_fire_behaviour_single.csv', index=False)
 
 # heath intensity
 # datetime_param_dict = {}
