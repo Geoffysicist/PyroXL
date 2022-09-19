@@ -80,11 +80,11 @@ if __name__ == '__main__':
     }
 
     # dictionary for categorical inputs - 'parameter_name': (class1, class2...classn)
-    class_param_dict = {
+    cat_param_dict = {
         'class_param1': ('foo','bar'),
         'class_param2': (-1,0,99),
     }
 
-    df = generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
+    df = generate_test_data(datetime_param_dict,num_param_dict,cat_param_dict)
 
     print(df)
