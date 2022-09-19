@@ -18,21 +18,21 @@ import test_data_generator as tdg
 # df.to_csv('pine_fmc.csv', index=False)
 
 #pine fuel availability
-datetime_param_dict = {}
+# datetime_param_dict = {}
 
-num_param_dict = {
-    'DF': (0,40,10),
-    'KBDI': (0,100,10),
-    'WAF': (3,5,0.5)
-}
+# num_param_dict = {
+#     'DF': (0,40,10),
+#     'KBDI': (0,100,10),
+#     'WAF': (3,5,0.5)
+# }
 
-class_param_dict = {}
+# class_param_dict = {}
 
-df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-df['fuel_avail'] =pine.fuel_availability(df.DF, df.KBDI, df.WAF)
+# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
+# df['fuel_avail'] =pine.fuel_availability(df.DF, df.KBDI, df.WAF)
 
-print(df.head())
-df.to_csv('pine_fuel_avail.csv', index=False)
+# print(df.head())
+# df.to_csv('pine_fuel_avail.csv', index=False)
 
 # heath fuel moist coeff
 # datetime_param_dict = {}
@@ -66,10 +66,10 @@ class_param_dict = {
 tsf = None #this is a zombie parameter in the code
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-fire_behaviour = pine.calc_fire_spread_single(df.fmc, df.U_10, df.DF,df.KBDI,tsf)
+fire_behaviour = pine.calc_fire_spread(df.fmc, df.U_10, df.DF,df.KBDI,tsf)
 df['ROS'], df['intensity'], df['flame_h'] = fire_behaviour
 print(df.head())
-df.to_csv('pine_fire_behaviour_single.csv', index=False)
+df.to_csv('pine_fire_behaviour_ensemble.csv', index=False)
 
 # heath intensity
 # datetime_param_dict = {}
