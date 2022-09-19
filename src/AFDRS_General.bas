@@ -31,6 +31,8 @@ Public Function FBI(ByVal intensity As Long, Optional fuel As String = "forest")
             intensity_b = Array(0, 50, 500, 4000, 20000, 40000) 'intensity_b and fbi_b must have same dimensions
         Case "savannah"
             intensity_b = Array(0, 100, 3000, 9000, 17500, 25000) 'intensity_b and fbi_b must have same dimensions
+        Case "pine"
+            intensity_b = Array(0, 100, 750, 4000, 10000, 30000) 'intensity_b and fbi_b must have same dimensions
         Case Else
             MsgBox "invalid fuel type"
             Exit Function
@@ -63,7 +65,7 @@ Public Function FBI(ByVal intensity As Long, Optional fuel As String = "forest")
 
 End Function
 
-Public Function intensity(ByVal ROS As Double, ByVal Fuel_load As Single) As Long
+Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
     'calculates the fireline intensity (kW/m) based on Byram 1959
     'args:
     '  ROS: forward rate of spread (km/h)
@@ -71,17 +73,17 @@ Public Function intensity(ByVal ROS As Double, ByVal Fuel_load As Single) As Lon
     
     'convert units
     ROS = ROS / 3600 'm/s
-    Fuel_load = Fuel_load / 10 'kg/m^2
+    fuel_load = fuel_load / 10 'kg/m^2
     
-    intensity = 18600 * ROS * Fuel_load
+    intensity = 18600 * ROS * fuel_load
 End Function
 
-Public Function Fuel_load(fl_max, tsf, k) As Integer
+Public Function fuel_load(fl_max, tsf, k) As Single
     'returns the fuel load (t/ha) based on time since fire and fuel accumulation curve parameter
     'args
     '  fl_max: the steady state fuel load (t/ha)
     '  tsf: time since fire (y)
     '  k: fuel accumulation curve parameter
     
-    Fuel_load = fl_max * (1 - Exp(-1 * tsf * k))
+    fuel_load = fl_max * (1 - Exp(-1 * tsf * k))
 End Function
