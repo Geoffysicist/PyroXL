@@ -1,106 +1,58 @@
-from spread_models import dry_forest_mod_for_testing as dfm
+from spread_models import dry_forest as forest
 import test_data_generator as tdg
+import pandas as pd
 
-# forest ROS
-# datetime_param_dict = {}
+fuel_params_dict = {
+    'FHS_s': 3,
+    'FHS_ns': 3,
+    'FL_s': 10,
+    'FL_ns': 3.5,
+    'FL_el': 2,
+    'FL_b': 2,
+    'FL_o': 4.5,
+    # 'FL_total': 12,
+    'Fk_s': 0.3,
+    'Fk_ns': 0.3,
+    'Fk_el': 0.3,
+    'Fk_b': 0.3,
+    # 'Fk_o': 0.3,
+    'Hk_ns': 0.3,
+    # 'Cov_o': 40,
+    'H_ns': 20,
+    'H_el': 2,
+    'H_o': 20,
+    'WRF_For': 3,
+}
 
-# num_param_dict = {
-#     'U_10': (0,70,10),
-#     'fhs_s': (1,4,1),
-#     'fhs_ns': (1,4,1),
-#     'h_ns': (5,25,5),
-#     'fmc': (0,30,10),
-#     'DF': (1,10,2),
-#     'wrf': (2,6,1)
-# }
+fuel_params_df = pd.DataFrame(fuel_params_dict, index=[0])
 
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['ROS'] =dfm.calc_rate_of_spread(
-#     df.fmc, df.U_10, df.DF,df.fhs_s,df.fhs_ns, df.h_ns, df.wrf
-# )
-
-# print(df.head())
-# df.to_csv('forest_ROS.csv', index=False)
-
-# forest flame height
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'ROS': (0,10000,250),
-#     'fh_e': (0,4,0.5),
-# }
-
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['flame_h'] =dfm.calc_flame_height(
-#     df.ROS, df.fh_e
-# )
-
-# print(df.head())
-# df.to_csv('forest_flame_height.csv', index=False)
-
-# # forest spotting distance
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'ROS': (0,10000,250),
-#     'U_10': (0,70,10),
-#     'fhs_s': (1,4,1),
-# }
-
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['spotting'] =dfm.calc_spotting_distance(
-#     df.ROS, df.U_10, df.fhs_s
-# )
-
-# print(df.head())
-# df.to_csv('forest_spotting_dist.csv', index=False)
-
-# forest fuel moisture
-# datetime_param_dict = {
-#     'datetime': ('2022-01-01', '2022-09-01', 90, 6),
-# }
-
-# num_param_dict = {
-#     'temp': (0,40,10),
-#     'rh': (0,100,10),
-# }
-
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['fmc'] =dfm.fuel_moisture_model(
-#     df.temp, df.rh, df.datetime
-# )
-
-# print(df.head())
-# df.to_csv('forest_fuel_moist.csv', index=False)
-
-# forest intensity
-datetime_param_dict = {}
+# small dataset
+datetime_param_dict = {
+    'datetime': ('2022-01-01', '2022-09-01', 90, 6),
+}
 
 num_param_dict = {
-    'ROS': (0,10000,2000),
-    'fl_s': (0,12,4),
-    'fl_ns': (1,8,4),
-    'fl_e': (1,8,4),
-    'fl_o': (0,15,5),
-    'h_o': (10,60,10),
-    'DF': (1,10,2),
-    'flame_h': (0,20,4)
+    'WindMagKmh_SFC': (10,50,20),
+    'RH_SFC': (10,100,50),
+    'T_SFC': (10,40,15),
+    # 'precipitation': (0,100,50),
+    # 'time_since_rain': (0,48,24),
+    'time_since_fire': (0,15,7.5),
+    'DF_SFC': (2,10,4),
 }
 
 class_param_dict = {}
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-df['intensity'] =dfm.calc_intensity(
-    df.DF, df.flame_h, df.ROS,df.fl_s,df.fl_ns, df.fl_e, None, df.fl_o, df.h_o
-)
+df['months'] = df.datetime.dt.month
+df['hours'] = df.datetime.dt.hour
+
+output_dict =forest.calculate(df,fuel_params_df.iloc[0])
+
+for param, series in output_dict.items():
+    df[param] = series
 
 print(df.head())
-df.to_csv('forest_intensity.csv', index=False)
+print(df.shape)
+df.to_csv('tests/forest_small.csv', index=False)
+# df.to_pickle('tests/forest_small.pkl')
