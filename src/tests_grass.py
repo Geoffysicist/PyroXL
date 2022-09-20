@@ -1,72 +1,62 @@
-from spread_models import csiro_grassland as grass
+from spread_models import grass
 import test_data_generator as tdg
+import pandas as pd
 
-# #grass fuel moist content
-# datetime_param_dict = {}
+fuel_params_dict = {
+    # 'FHS_s': 3,
+    # 'FHS_ns': 3,
+    # 'FL_s': 10,
+    # 'FL_ns': 3.5,
+    # 'FL_el': 2,
+    # 'FL_b': 2,
+    # 'FL_o': 4.5,
+    # 'FL_total': 12,
+    # 'Fk_s': 0.3,
+    # 'Fk_ns': 0.3,
+    # 'Fk_el': 0.3,
+    # 'Fk_b': 0.3,
+    # 'Fk_o': 0.3,
+    # 'Hk_ns': 0.3,
+    # 'Cov_o': 40,
+    # 'H_ns': 20,
+    # 'H_el': 2,
+    # 'H_o': 20,
+    # 'WRF_For': 3,
+}
 
-# num_param_dict = {
-#     'temp': (0,40,10),
-#     'rh': (0,100,10),
-# }
+fuel_params_df = pd.DataFrame(fuel_params_dict, index=[0])
 
-# class_param_dict = {}
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['fmc'] = grass.calc_fuel_moisture(df.temp, df.rh)
-
-# print(df.head())
-# df.to_csv('grass_fmc.csv', index=False)
-
-# grass fuel moist coeff
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'U_10': (0,70,10),
-#     'fmc': (5,30,5),
-# }
-
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['moist_coeff'] = grass.calc_fuel_moisture_factor(df.fmc, df.U_10)
-
-# print(df.head())
-# df.to_csv('grass_moist_coeff.csv', index=False)
-
-# #grass ROS
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'U_10': (0,70,10),
-#     'fmc': (5,30,5),
-#     'curing': (0,100,10)
-# }
-
-# class_param_dict = {
-#     'condition': ('natural', 'grazed', 'eaten-out')
-#     # 'condition': (3, 2, 1)
-# }
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# # df['ROS'] = grass.calc_rate_of_spread(df.fmc, df.U_10, df.curing,df.condition)
-
-# print(df.head())
-# df.to_csv('grass_ROS_inputs.csv', index=False)
-
-#grass flame height
-datetime_param_dict = {}
+# small dataset
+datetime_param_dict = {
+    # 'datetime': ('2022-01-01', '2022-09-01', 90, 6),
+}
 
 num_param_dict = {
-    'ROS': (0,20000,200),
-    # 'fuel_load': (1.5,7.5,3)
+    'WindMagKmh_SFC': (10,50,20),
+    'RH_SFC': (10,100,50),
+    'T_SFC': (10,40,15),
+    'Curing_SFC': (0,100,25),
+    # 'precipitation': (0,100,50),
+    # 'time_since_rain': (0,48,24),
+    # 'time_since_fire': (0,15,7.5),
+    # 'DF_SFC': (2,10,4),
 }
 
 class_param_dict = {
-    'condition': ('eaten-out', 'grazed', 'natural')
-    # 'condition': (3, 2, 1)
+        'grass_condition': (1,2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
+        'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
 }
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['flame_h'] = grass.calc_flame_height(df.ROS, df.fuel_load)
+# df['months'] = df.datetime.dt.month
+# df['hours'] = df.datetime.dt.hour
+
+output_dict =grass.calculate(df.to_xarray(),fuel_params_df.iloc[0])
+
+for param, series in output_dict.items():
+    df[param] = series
 
 print(df.head())
-df.to_csv('grass_flame_height_state.csv', index=False)
+print(df.shape)
+df.to_csv('tests/grass_small.csv', index=False)
+# df.to_pickle('tests/grass_small.pkl')

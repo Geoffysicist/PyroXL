@@ -22,6 +22,7 @@ def calc_fuel_cover (time_since_fire, productivity):
     rate of spread in spinifex grasslands of Western Australia (Mk2v3). [Range for total fuel cover: 15 - 75]
     """
     fuel_cover = np.empty(time_since_fire.shape)
+    
     fuel_cover_1 = 26.20 * np.power(time_since_fire, 0.227)
     fuel_cover_23 = 1.5*26.20 * np.power(time_since_fire, 0.227)
     fuel_cover[productivity == 1] = fuel_cover_1[productivity == 1]

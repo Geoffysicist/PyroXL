@@ -1,109 +1,67 @@
 from spread_models import pine
 import test_data_generator as tdg
+import pandas as pd
 
-# #pine fuel moist content
-# datetime_param_dict = {}
+fuel_params_dict = {
+    # 'FHS_s': 3,
+    # 'FHS_ns': 3,
+    # 'FL_s': 10,
+    # 'FL_ns': 3.5,
+    # 'FL_el': 2,
+    # 'FL_b': 2,
+    # 'FL_o': 4.5,
+    # 'FL_total': 12,
+    # 'Fk_s': 0.3,
+    # 'Fk_ns': 0.3,
+    # 'Fk_el': 0.3,
+    # 'Fk_b': 0.3,
+    # 'Fk_o': 0.3,
+    # 'Fk_total': 0.3,
+    # 'Hk_ns': 0.3,
+    # 'Cov_o': 40,
+    # 'H_ns': 20,
+    # 'H_el': 2,
+    # 'H_o': 20,
+    # 'WRF_For': 3,
+    # 'WF_Heath': 0.667,
+    'FTno_State': 0, # 7000 if Tasmania
+}
 
-# num_param_dict = {
-#     'temp': (0,40,10),
-#     'rh': (0,100,10),
-# }
+fuel_params_df = pd.DataFrame(fuel_params_dict, index=[0])
 
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['fmc'] =pine.fuel_moisture_model(df.temp, df.rh)
-
-# print(df.head())
-# df.to_csv('pine_fmc.csv', index=False)
-
-#pine fuel availability
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'DF': (0,40,10),
-#     'KBDI': (0,100,10),
-#     'WAF': (3,5,0.5)
-# }
-
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['fuel_avail'] =pine.fuel_availability(df.DF, df.KBDI, df.WAF)
-
-# print(df.head())
-# df.to_csv('pine_fuel_avail.csv', index=False)
-
-# heath fuel moist coeff
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'U_10': (0,70,10),
-#     'fmc': (5,30,5),
-# }
-
-# class_param_dict = {}
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['moist_coeff'] = grass.calc_fuel_moisture_factor(df.fmc, df.U_10)
-
-# print(df.head())
-# df.to_csv('grass_moist_coeff.csv', index=False)
-
-# pine fire behaviour
-datetime_param_dict = {}
+# small dataset
+datetime_param_dict = {
+    # 'datetime': ('2022-01-01', '2022-09-01', 90, 6),
+}
 
 num_param_dict = {
-    'U_10': (0,70,10),
-    'fmc': (0,30,10),
-    'DF': (0,10,2),
-    'KBDI': (0,200,20)
+    'WindMagKmh_SFC': (10,50,20),
+    'RH_SFC': (10,100,20),
+    'T_SFC': (10,40,15),
+    # 'Curing_SFC': (0,100,25),
+    # 'precipitation': (0,100,50),
+    # 'time_since_rain': (0,48,24),
+    'time_since_fire': (0,15,7.5),
+    'DF_SFC': (2,10,4),
+    # 'SDI_SFC': (0,200,50),
+    'KBDI_SFC': (0,200,50),
 }
 
 class_param_dict = {
+        # 'grass_condition': (1,2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
+        # 'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
 }
 
-tsf = None #this is a zombie parameter in the code
-
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-fire_behaviour = pine.calc_fire_spread(df.fmc, df.U_10, df.DF,df.KBDI,tsf)
-df['ROS'], df['intensity'], df['flame_h'] = fire_behaviour
+# df['months'] = df.datetime.dt.month
+# df['hours'] = df.datetime.dt.hour
+
+output_dict =pine.calculate(df.to_xarray(),fuel_params_df.iloc[0])
+
+for param, series in output_dict.items():
+    df[param] = series
+
 print(df.head())
-df.to_csv('pine_fire_behaviour_ensemble.csv', index=False)
-
-# heath intensity
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'ROS': (0,20000,200),
-#     'fl_max': (20, 20, 1),
-#     'tsf': (0,25,2),
-#     'k': (0.2,0.2,1),
-# }
-
-# class_param_dict = {
-#     # 'k': (0.2)
-#     # 'fl_max': (20)
-# }
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['intensity'] = heath.calc_intensity(df.ROS, df.fl_max, df.tsf,df.k)
-
-# print(df.head())
-# df.to_csv('heath_intensity.csv', index=False)
-
-# heath flame height
-# datetime_param_dict = {}
-
-# num_param_dict = {
-#     'intensity': (0,200000,500),
-# }
-
-# class_param_dict = {
-# }
-
-# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-# df['flame_h'] = heath.calc_flame_height(df.intensity)
-
-# print(df.head())
-# df.to_csv('heath_flame_height.csv', index=False)
+print(df.shape)
+df.to_csv('tests/pine_small.csv', index=False)
+# df.to_pickle('tests/pine_small.pkl')
