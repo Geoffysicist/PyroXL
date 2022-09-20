@@ -147,7 +147,4 @@ Public Function Spotting_forest(ROS, U_10, fhs_s As Single) As Integer
     End If
 End Function
 
-Public Function test() As Single
-    test = Mf_AFDRS()
-End Function
 

@@ -1,5 +1,5 @@
 Attribute VB_Name = "AFDRS_heath"
-Public Function FMC_heath(temp, rh, rain, hours As Single) As Single
+Public Function FMC_heath(temp, rh, rain, hours As Double) As Double
     'return fuel moisture content (%). Based on:
     '  Cruz, M., et al. (2010). Fire dynamics in mallee-heath: fuel, weather
     '  and fire behaviour prediction in south Australian semi-arid shrublands.
@@ -15,8 +15,8 @@ Public Function FMC_heath(temp, rh, rain, hours As Single) As Single
     '  rain: precipitation in the last 48 hours (mm)
     '  hours: time since rain or dewfall stopped (h)
     
-    Dim mc_1 As Single
-    Dim mc_2 As Single
+    Dim mc_1 As Double
+    Dim mc_2 As Double
     
     mc_1 = 4.37 + 0.161 * rh - 0.1 * (temp - 25)
     If rh <= 60 Then
@@ -27,7 +27,7 @@ Public Function FMC_heath(temp, rh, rain, hours As Single) As Single
     FMC_heath = mc_1 + mc_2
 End Function
 
-Public Function Mf_heath(mc As Single) As Single
+Public Function Mf_heath(mc As Double) As Double
     'returns the heathland moisture function
     'args
     '  mc: fuel moisture content (%)
@@ -42,7 +42,7 @@ Public Function Mf_heath(mc As Single) As Single
     End Select
 End Function
 
-Public Function ROS_heath(U_10, h_el, mc As Single, overstorey As Boolean) As Single
+Public Function ROS_heath(U_10, h_el, mc As Double, overstorey As Boolean) As Double
     'return forward rate of spread in m/h [range: 0-6000 m/h]
     'Anderson, W. R., et al. (2015). "A generic, empirical-based model for predicting rate of fire
     'spread in shrublands." International Journal of Wildland Fire 24(4): 443-460.
@@ -52,11 +52,11 @@ Public Function ROS_heath(U_10, h_el, mc As Single, overstorey As Boolean) As Si
     '  mc: fuel moisture content (%)
     '  overstorey: presence or absence of woodland overstorey (true/false)
     
-    Dim Mf As Single 'fuel moisture factor
+    Dim Mf As Double 'fuel moisture factor
     Mf = Mf_heath(mc)
     
     'wrf depends on presence or absence of woodland overstorey
-    Dim wrf As Single: wrf = 0.667
+    Dim wrf As Double: wrf = 0.667
      
     If overstorey = True Then
         wrf = 0.35
@@ -70,7 +70,7 @@ Public Function ROS_heath(U_10, h_el, mc As Single, overstorey As Boolean) As Si
     ROS_heath = ROS_heath / (1 + Exp(-0.4 * (12 - mc)))
     
 End Function
-Public Function intensity_heath(ROS, fl_max, tsf, k) As Single
+Public Function intensity_heath(ROS, fl_max, tsf, k) As Double
     'returns the fire line intensity (kW/m)
     'args
     '  ROS: forward rate of spread m/h
@@ -78,14 +78,14 @@ Public Function intensity_heath(ROS, fl_max, tsf, k) As Single
     '  tsf: time since fire y
     '  k: fuel accumulation curve constant
     
-    Dim fuel_load_ As Single
+    Dim fuel_load_ As Double
     fuel_load_ = fl_max * (1 - Exp(-1 * tsf * k)) 'fuel_load(fl_max, tsf, k)
     
     'intensity_heath = intensity(ROS, fuel_load_)
     intensity_heath = 18600 * (fuel_load_ / 10) * (ROS / 3600)
 End Function
 
-Public Function Flame_height_heath(intensity As Single) As Single
+Public Function Flame_height_heath(intensity As Double) As Double
     'returns flame height (m)
     'No equation for flame height was given in the Anderson et al. paper (2015).
     'Here we use the flame height calculation for mallee-heath shrublands (Cruz, M. G., et al. (2013).

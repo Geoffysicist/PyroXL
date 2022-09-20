@@ -15,26 +15,89 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     Set KeyCells = Range("A:B")
     If Not Application.Intersect(KeyCells, Range(Target.Address)) Is Nothing Then
         'use date field to determine number of rows
-        Worksheets("AFDRS").Unprotect
-        Call trim_output(Range("A15"), Range("G15:Q15"))
-        Worksheets("AFDRS").Protect
+        Call trim_output(Range("A15"), Range("G15:AA15"))
     End If
     
     'if grass state has changed need to recalculate grass fuel load
-    Set KeyCells = Range("state_grass")
+    Set KeyCells = Range("N3")
     If Not Application.Intersect(KeyCells, Range(Target.Address)) Is Nothing Then
-        Select Case Range("state_grass").Value
+        Dim fl_grass As Single
+        Select Case Range("N3").Value
             Case "natural"
-                Range("fl_grass").Value = 6
+                fl_grass = 6
             Case "grazed"
-                Range("fl_grass").Value = 4.5
+                fl_grass = 4.5
             Case "eaten-out"
-                Range("fl_grass").Value = 1.5
+                fl_grass = 1.5
         End Select
-        'MsgBox "Cell " & Target.Address & " has changed."
+        Range("O3").Value = fl_grass
     End If
     
-    'if any of the input cells have changed need to recalculate all outputs
-    'Set KeyCells = Range("weather,fhs_s,H2,H4:H7,H9:H10")
+    'if forest strata fuel loads have changed adjust hazard scores
+    If Target.Address = "$I$4" Then 'surface load
+        Select Case Target.Value
+            Case Is <= 4
+                haz_score = 1
+            Case Is <= 9
+                haz_score = 2
+            Case Is <= 13
+                haz_score = 3
+            Case Is <= 18
+                haz_score = 3.5
+            Case Else
+                haz_score = 4
+        End Select
+        Range("H4").Value = haz_score
+     End If
+    
+    If Target.Address = "$I$5" Then 'near surface load
+        Select Case Target.Value
+            Case Is <= 2
+                haz_score = 1
+            Case Is <= 3
+                haz_score = 2
+            Case Is <= 4
+                haz_score = 3
+            Case Is <= 6
+                haz_score = 3.5
+            Case Else
+                haz_score = 4
+        End Select
+        Range("H5").Value = haz_score
+     End If
+    
+    If Target.Address = "$I$6" Then 'elevated load
+        Select Case Target.Value
+            Case Is <= 1
+                haz_score = 1
+            Case Is <= 2
+                haz_score = 2
+            Case Is <= 3
+                haz_score = 3
+            Case Is <= 5
+                haz_score = 3.5
+            Case Else
+                haz_score = 4
+        End Select
+        Range("H6").Value = haz_score
+     End If
+    
+    If Target.Address = "$I$7" Then 'bark load
+        Select Case Target.Value
+            Case Is < 1
+                haz_score = 0
+            Case Is < 2
+                haz_score = 1
+            Case Is < 5
+                haz_score = 2
+            Case Is < 7
+                haz_score = 3
+            Case Else
+                haz_score = 4
+        End Select
+        Range("H7").Value = haz_score
+     End If
+    
+    'MsgBox Target.Address
 End Sub
 

@@ -1,6 +1,6 @@
-a = 4
-b = 6
+d = {
+    'a': 'hello',
+    'b': 42,
+}
 
-a *= 0.5
-
-print(a, b)
+print(d['a'], d['b'])

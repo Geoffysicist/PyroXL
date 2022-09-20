@@ -1,7 +1,19 @@
 Attribute VB_Name = "PyroXL_helpers"
+Private Sub calculate_activesheet()
+    ActiveSheet.EnableCalculation = True
+    ActiveSheet.Calculate
+    ActiveSheet.EnableCalculation = False
+End Sub
+
+Private Sub calculate_selected()
+    Selection.Calculate
+End Sub
+
 Private Sub Save_Distro()
     ThisWorkbook.Save
-
+    
+    Call set_defaults
+    
     fn = Split(ThisWorkbook.FullName, ".")(0) + "_" + Format(Date, "YYYYMMDD")
     
     ThisWorkbook.SaveAs (fn)
@@ -23,7 +35,35 @@ Private Sub Save_Distro()
     ThisWorkbook.Save
 End Sub
 
-Private Sub stop_calculation()
+Public Sub export_modules()
+    Dim path, fn As String
+    
+    path = ThisWorkbook.path & "\src\"
+    
+    For Each cmp In ThisWorkbook.VBProject.VBComponents
+        Select Case cmp.Type
+            Case Is = 1 'module
+                cmp.Export path & cmp.Name & ".bas"
+            Case Is = 3 'form
+                cmp.Export path & cmp.Name & ".frm"
+            Case Else
+        End Select
+    Next cmp
+End Sub
+
+
+Private Sub run_all_tests()
+    For Each ws In ThisWorkbook.Worksheets
+        If InStr(ws.Name, "tests_") > 0 Then
+            ws.EnableCalculation = True
+            ws.Calculate
+            ws.EnableCalculation = False
+        End If
+    Next ws
+
+End Sub
+
+Public Sub disable_test_calculation()
     For Each ws In ThisWorkbook.Worksheets
         If InStr(ws.Name, "tests_") > 0 Then
             ws.EnableCalculation = False

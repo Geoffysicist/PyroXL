@@ -1,4 +1,4 @@
-from spread_models import heathland as heath
+from spread_models import heathland_mod_for_testing as heath
 import test_data_generator as tdg
 
 # #heath fuel moist content
@@ -77,17 +77,49 @@ import test_data_generator as tdg
 # df.to_csv('heath_intensity.csv', index=False)
 
 # heath flame height
+# datetime_param_dict = {}
+
+# num_param_dict = {
+#     'intensity': (0,200000,500),
+# }
+
+# class_param_dict = {
+# }
+
+# df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
+# df['flame_h'] = heath.calc_flame_height(df.intensity)
+
+# print(df.head())
+# df.to_csv('heath_flame_height.csv', index=False)
+
 datetime_param_dict = {}
 
 num_param_dict = {
-    'intensity': (0,200000,500),
+    'RH_SFC': (0,100,20),
+    'T_SFC': (0,40,10),
+    'precipitation': (0,100,50),
+    'time_since_rain': (0,48,24),
+    'WindMagKmh_SFC': (0,60,20),
+    'time_since_fire': (0,20,10),
 }
 
 class_param_dict = {
 }
 
+fuel_params = {
+    'WF_Heath': 0.667,
+    'H_el': 2,
+    'FL_total': 3,
+    'Fk_total': 0.2,
+}
+
+print(fuel_params['WF_Heath'])
+
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
-df['flame_h'] = heath.calc_flame_height(df.intensity)
+output_dict = heath.calculate(df,fuel_params)
+
+for param, series in output_dict.items():
+    df[param] = series
 
 print(df.head())
-df.to_csv('heath_flame_height.csv', index=False)
+df.to_csv('heath.csv', index=False)

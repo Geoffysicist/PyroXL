@@ -1,5 +1,29 @@
 Attribute VB_Name = "AFDRS_General"
-Public Function FBI(ByVal intensity As Long, Optional fuel As String = "forest") As Single
+Public Sub set_defaults()
+    Range("C15").Value = 25
+    Range("D15").Value = 30
+    Range("E15").Value = 20
+    Range("F15").Value = 8
+    Range("H2").Value = 3
+    Range("I4").Value = 10
+    Range("I5").Value = 3.5
+    Range("I6").Value = 2
+    Range("I7").Value = 2
+    Range("I8").Value = 4.5
+    Range("H10").Value = 20
+    Range("H11").Value = 2
+    Range("H12").Value = 20
+    Range("N3").Value = "grazed"
+    Range("N4").Value = 80
+    Range("V2").Value = 0
+    Range("V3").Value = 48
+    Range("V4").Value = False
+    Range("V5").Value = 2
+    Range("V6").Value = 25
+    Range("Z2").Value = 100
+End Sub
+
+Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
 
     ' returns FBI.
     'args
@@ -9,7 +33,7 @@ Public Function FBI(ByVal intensity As Long, Optional fuel As String = "forest")
     
     Dim intensity_b() As Variant 'bounds for intensity classes
     Dim fbi_b() As Variant 'bounds for fba classes
-    Dim intensity_ha As Long 'arbitrary high anchor for intensity
+    Dim intensity_ha As Double 'arbitrary high anchor for intensity
     Dim fbi_ha As Integer 'arbitrary high anchor for fbi
     Dim intensity_la, intensity_ua, fbi_la, fbi_ua As Integer 'upper and lower anchors for intensity and fbi
   
