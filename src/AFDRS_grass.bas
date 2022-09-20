@@ -6,6 +6,7 @@ Public Function FMC_grass(temp, rh As Single) As Single
     '  rh: relative humidity (%)
     
     FMC_grass = 9.58 - 0.205 * temp + 0.138 * rh
+    FMC_grass = WorksheetFunction.Max(FMC_grass, 5)
 End Function
 Public Function curing_coeff_grass(curing As Single) As Single
     'return the curing coefficient based on Cruz et al. (2015)
@@ -35,7 +36,7 @@ Public Function moist_coeff_grass(U_10, mc As Single) As Single
     
 End Function
 
-Public Function ROS_grass(U_10, mc, curing As Single, state As String) As Integer
+Public Function ROS_grass(U_10, mc As Single, curing As Single, state As String) As Single
     'return the forward ROS (m/h) ignoring slope
     'args
     '  U_10: 10 m wind speed (km/h)

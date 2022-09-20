@@ -1,5 +1,5 @@
 Attribute VB_Name = "AFDRS_forest"
-Public Function Intensity_forest(ROS, DF, flame_h As Double, fl_s, fl_ns, fl_e, fl_o, h_o As Single) As Long
+Public Function Intensity_forest(ROS, DF, flame_h, fl_s, fl_ns, fl_e, fl_o, h_o As Single) As Double
     'return the intensity based on fuel load and ROS
     'note AFDRS caps surface fuel load at 10 t/ha (1 kg/m)
     'args
@@ -13,25 +13,31 @@ Public Function Intensity_forest(ROS, DF, flame_h As Double, fl_s, fl_ns, fl_e, 
     '  h_o: overstorey (canopy) height (m)
        
     Dim fuel_avail As Single
-    Dim Fuel_load As Single
+    Dim fuel_load As Single
     Dim flame_h_elev As Single: flame_h_elev = 1 'm
     Dim flame_h_crown_frac As Single: flame_h_crown_frac = 0.66 'dimensionless
     fuel_avail = DF * 0.1
+
+    fl_s = fl_s * fuel_avail
+    fl_ns = fl_ns * fuel_avail
+    fl_e = fl_e * fuel_avail
+    fl_o = fl_o * fuel_avail
     
     'cap surface fuel load
     fl_s = WorksheetFunction.Min(10, fl_s)
     
     'accumulate fuel load based on flame height
-    Fuel_load = fl_s + fl_ns
+    fuel_load = fl_s + fl_ns
     If flame_h > flame_h_elev Then
-        Fuel_load = Fuel_load + fl_e
+        fuel_load = fuel_load + fl_e
     End If
+    
     If flame_h > (h_o * flame_h_crown_frac) Then
-        Fuel_load = Fuel_load + 0.5 * fl_o
+        fuel_load = fuel_load + 0.5 * fl_o
     End If
-    Fuel_load = Fuel_load * fuel_avail
+
         
-    Intensity_forest = intensity(ROS, Fuel_load)
+    Intensity_forest = intensity(ROS, fuel_load)
 End Function
 
 Public Function Flame_height_forest(ROS As Double, fh_e As Single) As Single
@@ -43,7 +49,7 @@ Public Function Flame_height_forest(ROS As Double, fh_e As Single) As Single
     Flame_height_forest = 0.0193 * ROS ^ 0.723 * Exp(fh_e * 0.64) * 1.07
 End Function
 
-Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, WAF As Single) As Integer
+Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, WAF As Single) As Single
     'return the forward ROS (m/h) ignoring slope
     'args
     '  U_10: 10 m wind speed (km/h)
@@ -56,6 +62,8 @@ Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, WAF As Single) As
     
     Dim wind_threshold As Single: wind_threshold = 5
     Dim fuel_avail As Single: fuel_avail = DF * 0.1
+    h_ns = WorksheetFunction.Min(h_ns, 20#)
+    
     
     Dim Mf As Single 'moisture function
     Mf = Mf_forest((fmc))
@@ -116,7 +124,7 @@ Public Function Mf_forest(fmc As Single) As Single
     If fmc <= 4 Then
         Mf_forest = 2.31
     ElseIf fmc > 20 Then
-        Mf_forest = 0
+        Mf_forest = 0.05
     Else
         Mf_forest = 18.35 * fmc ^ -1.495
     End If
@@ -139,7 +147,4 @@ Public Function Spotting_forest(ROS, U_10, fhs_s As Single) As Integer
     End If
 End Function
 
-Public Function test() As Single
-    test = Mf_AFDRS()
-End Function
 
