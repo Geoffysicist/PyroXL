@@ -1,17 +1,24 @@
 """ Generates markdown documentation from VBA docstrings
 """
-in_fn = 'src/vba_scripts/AFDRS_dry_forest.bas'
-out_fn = 'docs/guide/AFDRS_dry_forest.md'
+import os
 
-with open(in_fn, 'r') as bas_file:
-    doc = bas_file.readlines()
+path = 'src/vba_scripts'
 
-doc_str = '## AFDRS_dry_forest\n'
-for line in doc:
-    if ('Public ' or 'Sub ') in line:
-        doc_str += f'\n### {line}'
-    elif "''' " in line:
-        doc_str += line.replace("'''","")
+filenames = os.listdir(path)
 
-with open(out_fn, 'w') as doc_file:
-    doc_file.write(doc_str)
+for fn in filenames:
+    if '.bas' in fn:
+        name,suffix = fn.split('.')
+        doc_str = f'## {name}\n'
+
+        with open(f'src/vba_scripts/{fn}', 'r') as bas_file:
+            doc = bas_file.readlines()
+
+        for line in doc:
+            if ('Public ' or 'Sub ') in line:
+                doc_str += f'\n### {line}'
+            elif "''' " in line:
+                doc_str += line.replace("'''","")
+
+        with open(f'docs/guide/{name}.md','w') as md_file:
+            md_file.write(doc_str)
