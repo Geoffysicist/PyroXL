@@ -32,10 +32,10 @@ datetime_param_dict = {
 }
 
 num_param_dict = {
-    'WindMagKmh_SFC': (10,50,20),
-    'RH_SFC': (10,100,50),
-    'T_SFC': (10,40,15),
-    'Curing_SFC': (0,100,25),
+    'WindMagKmh_SFC': (10,50,10),
+    'RH_SFC': (10,100,25),
+    'T_SFC': (10,40,10),
+    'Curing_SFC': (0,100,20),
     # 'precipitation': (0,100,50),
     # 'time_since_rain': (0,48,24),
     # 'time_since_fire': (0,15,7.5),
@@ -44,12 +44,15 @@ num_param_dict = {
 
 class_param_dict = {
         'grass_condition': (1,2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
-        'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
+        # 'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
 }
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
 # df['months'] = df.datetime.dt.month
 # df['hours'] = df.datetime.dt.hour
+df['GrassFuelLoad_SFC']  = 4.5
+df.GrassFuelLoad_SFC = df.GrassFuelLoad_SFC.mask(df.grass_condition == 1, 1.5)
+df.GrassFuelLoad_SFC = df.GrassFuelLoad_SFC.mask(df.grass_condition == 3, 6)
 
 output_dict =grass.calculate(df.to_xarray(),fuel_params_df.iloc[0])
 

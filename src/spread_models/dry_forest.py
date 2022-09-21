@@ -169,7 +169,7 @@ def calculate(dataset, fuel_parameters):
     """
 
     months = dataset['months']
-    hours = dataset['hours']
+    hours = dataset['hours']    
 
     dead_fuel_moisture = fuel_moisture_model(dataset['T_SFC'],
                                              dataset['RH_SFC'],
@@ -218,4 +218,5 @@ def calculate(dataset, fuel_parameters):
             'intensity': intensity,
             'spotting_distance': spotting_distance,
             'rating_1': rating_1,
-            'index_1': index_1}
+            'index_1': index_1,
+            }
