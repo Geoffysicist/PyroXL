@@ -9,7 +9,7 @@ User versions have a date stamp subscript (eg. PyroXL_AFDRS_20220921) and are lo
 
 Test and development versions have no subscript, are unlocked and include test tabs. Note the development versions have automatic calculation turned of so worksheets must be calculated manually.
 
-A rudimentary guide to the VBA user defined functions can be found in the docs/guide directory. The user guides are markdown files so are probably best read using a browser through the github repository: https://https://github.com/Geoffysicist/PyroXL/tree/main/docs/guide
+A rudimentary guide to the VBA user defined functions can be found in the docs/guide directory. The user guides are markdown files so are probably best read using a browser through the github repository: https://github.com/Geoffysicist/PyroXL/tree/main/docs/guide
 
 If you use this code in other projects please acknowledge the author and NSW Rural Fire Service.
 
