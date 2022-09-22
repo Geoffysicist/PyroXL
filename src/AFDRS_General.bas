@@ -111,3 +111,33 @@ Public Function fuel_amount(fuel_param_max, tsf, k) As Double
     
     fuel_amount = fuel_param_max * (1 - Exp(-1 * tsf * k))
 End Function
+
+Public Function fl_to_fhs(layer As String, fuel_load As Single)
+    ''' converts a fuel load to a VESTA fuel hazard score
+    '''
+    ''' args
+    '''   layer: fuel layer (surface, near surface, elevated, bark)
+    '''   fuel_load: (t/ha)
+    
+    Dim fhs_dict 'fuel hazard score
+    Set fhs_dict = CreateObject("Scripting.Dictionary")
+    fhs_dict.Add "surface", Array(1, 2, 3, 3.5, 4)
+    fhs_dict.Add "near surface", Array(1, 2, 3, 3.5, 4)
+    fhs_dict.Add "elevated", Array(1, 2, 3, 3.5, 4)
+    fhs_dict.Add "bark", Array(0, 1, 2, 3, 4)
+    
+    Dim fl_dict 'fuel load class boundaries t/ha
+    Set fl_dict = CreateObject("Scripting.Dictionary")
+    fl_dict.Add "surface", Array(4, 9, 13, 18)
+    fl_dict.Add "near surface", Array(2, 3, 4, 6)
+    fl_dict.Add "elevated", Array(1, 2, 3, 5)
+    fl_dict.Add "bark", Array(0, 1, 2, 5)
+    
+    fl_to_fhs = fhs_dict(layer)(UBound(fhs_dict(layer)))
+    
+    For i = UBound(fl_dict(layer)) To 0 Step -1
+        If fuel_load <= fl_dict(layer)(i) Then
+            fl_to_fhs = fhs_dict(layer)(i)
+        End If
+    Next i
+End Function

@@ -92,6 +92,17 @@ Public Function Flame_height_grass(ROS As Single, state As String) As Single
     End Select
 End Function
 
+Public Function state_to_load_grass(state As String) As Single
+    Select Case state
+        Case "natural"
+            state_to_load_grass = 6
+        Case "grazed"
+            state_to_load_grass = 4.5
+        Case "eaten-out"
+            state_to_load_grass = 1.5
+    End Select
+End Function
+
 Public Function enumerate_state_grass(state As String) As Integer
     Select Case state
         Case "natural"
@@ -101,8 +112,8 @@ Public Function enumerate_state_grass(state As String) As Integer
         Case "eaten-out"
             enumerate_state_grass = 1
     End Select
-
 End Function
+
 Public Function categorise_state_grass(state As Integer) As String
     Select Case state
         Case 3
