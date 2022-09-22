@@ -1,34 +1,42 @@
 Attribute VB_Name = "AFDRS_General"
 Public Sub set_defaults()
-    ''' Sets the values for the AFDRS models to their defaults
-    ''' as described in ?
-
-    Range("C15").Value = 25
-    Range("D15").Value = 30
-    Range("E15").Value = 20
-    Range("F15").Value = 8
-    Range("H2").Value = 3
-    Range("I4").Value = 10
-    Range("I5").Value = 3.5
-    Range("I6").Value = 2
-    Range("I7").Value = 2
-    Range("I8").Value = 4.5
-    Range("H10").Value = 20
-    Range("H11").Value = 2
-    Range("H12").Value = 20
-    Range("N3").Value = "grazed"
-    Range("N4").Value = 80
-    Range("V2").Value = 0
-    Range("V3").Value = 48
-    Range("V4").Value = False
-    Range("V5").Value = 2
-    Range("V6").Value = 25
-    Range("Z2").Value = 100
+    Range("A15").Value = Date 'date (formatted)
+    Range("B15").Value = time 'time (formatted)
+    Range("C15").Value = 25 'temp
+    Range("D15").Value = 30 'RH
+    Range("E15").Value = "N" 'wind direction
+    Range("F15").Value = 20 'wind speed
+    Range("G13").Value = 100 'KBDI
+    Range("G15").Value = 8 'DF
+    Range("J2").Value = 3 'WAF
+    Range("J10").Value = 20 'forest h_ns
+    Range("J11").Value = 2 'forest h_el
+    Range("J12").Value = 20 'forest h_o
+    Range("K4").Value = 10 'forest fl_s
+    Range("K5").Value = 3.5 'forest fl_ns
+    Range("K6").Value = 2 'forest fl_e
+    Range("K7").Value = 2 'forest fl_b
+    Range("K8").Value = 4.5 'forest fl_o
+    Range("M10").Value = "dry" 'forest submodel
+    Range("P3").Value = "grazed" 'grass state
+    Range("P4").Value = 80 'grass curing
+    Range("X2").Value = 0 'heath precipation last 48 hours
+    Range("X3").Value = 48 'heath time since rain
+    Range("X4").Value = False 'heath presence of overstorey
+    Range("X5").Value = 2 'heath h_el
+    Range("X6").Value = 25 'heath  time since fire
+    Range("AH2").Value = 3 'mallee fl_s
+    Range("AH3").Value = 1 'mallee fl_o
+    Range("AH4").Value = 18 'mallee Cov_o
+    Range("AH5").Value = 4.5 'mallee H_o
+    Range("AH6").Value = 20 'mallee time since fire
+    Range("AH7").Value = 0 'mallee precipation last 48 hours
+    Range("AH8").Value = 48 'mallee time since rain
 End Sub
 
 Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
-    ''' returns the AFDRS Fire Behaviour Index (FBI).
-    ''' 
+    '''  returns FBI.
+    '''
     ''' args
     '''   intensity: file line intensity (kW/m)
     '''   fuel: the fuel type
@@ -94,7 +102,7 @@ End Function
 
 Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
     ''' returns the fireline intensity (kW/m) based on Byram 1959
-    ''' 
+    '''
     ''' args
     '''   ROS: forward rate of spread (km/h)
     '''   fuel_load: fine fuel load (t/ha)
@@ -107,13 +115,42 @@ Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Dou
 End Function
 
 Public Function fuel_amount(fuel_param_max, tsf, k) As Double
-    ''' returns the adjusted fuel parameter based on time since fire and 
-    ''' fuel accumulation curve parameter
-    ''' 
+    ''' returns the adjusted fuel parameter based on time since fire and fuel accumulation curve parameter
+    '''
     ''' args
     '''   fuel_param_max: the steady state value for the fuel parameter
     '''   tsf: time since fire (y)
     '''   k: fuel accumulation curve parameter
     
     fuel_amount = fuel_param_max * (1 - Exp(-1 * tsf * k))
+End Function
+
+Public Function fl_to_fhs(layer As String, fuel_load As Single)
+    ''' converts a fuel load to a VESTA fuel hazard score
+    '''
+    ''' args
+    '''   layer: fuel layer (surface, near surface, elevated, bark)
+    '''   fuel_load: (t/ha)
+    
+    Dim fhs_dict 'fuel hazard score
+    Set fhs_dict = CreateObject("Scripting.Dictionary")
+    fhs_dict.Add "surface", Array(1, 2, 3, 3.5, 4)
+    fhs_dict.Add "near surface", Array(1, 2, 3, 3.5, 4)
+    fhs_dict.Add "elevated", Array(1, 2, 3, 3.5, 4)
+    fhs_dict.Add "bark", Array(0, 1, 2, 3, 4)
+    
+    Dim fl_dict 'fuel load class boundaries t/ha
+    Set fl_dict = CreateObject("Scripting.Dictionary")
+    fl_dict.Add "surface", Array(4, 9, 13, 18)
+    fl_dict.Add "near surface", Array(2, 3, 4, 6)
+    fl_dict.Add "elevated", Array(1, 2, 3, 5)
+    fl_dict.Add "bark", Array(0, 1, 2, 5)
+    
+    fl_to_fhs = fhs_dict(layer)(UBound(fhs_dict(layer)))
+    
+    For i = UBound(fl_dict(layer)) To 0 Step -1
+        If fuel_load <= fl_dict(layer)(i) Then
+            fl_to_fhs = fhs_dict(layer)(i)
+        End If
+    Next i
 End Function

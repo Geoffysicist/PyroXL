@@ -51,7 +51,6 @@ Public Sub export_modules()
     Next cmp
 End Sub
 
-
 Private Sub run_all_tests()
     For Each ws In ThisWorkbook.Worksheets
         If InStr(ws.Name, "tests_") > 0 Then
@@ -60,7 +59,6 @@ Private Sub run_all_tests()
             ws.EnableCalculation = False
         End If
     Next ws
-
 End Sub
 
 Public Sub disable_test_calculation()
@@ -99,29 +97,49 @@ Public Function Power(coefficient, exponent) As Double
     Power = coefficient ^ exponent
 End Function
 
-
-Public Sub test(arg1 As Integer, ParamArray p_array() As Variant)
-    Dim this_array, that_array, big_array As Variant
+Public Function cardinal_to_degrees(ByVal cardinal As String) As Single
+    ''' returns a compass direction in degrees
+    '''
+    ''' args
+    '''   cardinal: a cardinal direction (N, NNE, NE, ENE, E, ESE, SE, SSE,
+    '''                                   S, SSW, SW, WSW, W, WNW, NW, NNW)
     
-    If UBound(p_array) < LBound(p_array) Then
-        MsgBox "empty"
-        p_array = Array(1, 2, 3, 4)
+    'cardinal = UCase(cardinal)
+    Dim cardinal_array As Variant
+    Dim i As Variant
+    Dim pos As Variant
+    
+    cardinal_array = Array( _
+        "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", _
+        "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW" _
+        )
+    Dim degree_array() As Single
+    step = 360 / (UBound(cardinal_array) + 1) 'zero indexed array
+    d = 0
+    
+    For i = 0 To UBound(cardinal_array)
+        ReDim Preserve degree_array(i)
+        degree_array(i) = d
+        d = d + step
+    Next i
+    
+    i = Application.Match(cardinal, cardinal_array, False) 'zero indexed array
+    
+    If IsError(i) Then
+        cardinal_to_degrees = -9999
     Else
-        MsgBox p_array(1)
+        cardinal_to_degrees = degree_array(i - 1)
+    End If
+End Function
+
+Public Function backbearing(ByVal bearing As Variant) As Single
+    If Not IsNumeric(bearing) Then
+        bearing = cardinal_to_degrees(bearing)
     End If
     
-    If UBound(p_array) < LBound(p_array) Then
-        MsgBox "empty"
+    If bearing < 180 Then
+        backbearing = bearing + 180
     Else
-        MsgBox p_array(1)
+        backbearing = bearing - 180
     End If
-    this_array = Array(1, 2, 3, 4)
-    that_array = Array(5, 6, 7, 8)
-    big_array = Array(this_array, that_array)
-
-End Sub
-
-Public Sub test2()
-    this_array = Array(5, 6, 7, 8)
-    Call test(99, this_array(0), this_array(1))
-End Sub
+End Function

@@ -7,38 +7,38 @@ Private Const KJKG_PER_BTULB = 2.326 'kg/kJ per Btu/lb
 Private Const MSEC_PER_FTMIN = 0.00508 'm/s per ft/min
 
 Public Function FMC_pine(temp, rh As Single) As Single
-    ' calculate the grass fuel moisture content as % based on McArthur (1966)
-    ' 
-    ' args
-    '   temp: air temperature (C)
-    '   rh: relative humidity (%)
+    ''' returns the grass fuel moisture content (%) based on McArthur (1966)
+    '''
+    ''' args
+    '''   temp: air temperature (C)
+    '''   rh: relative humidity (%)
 
     FMC_pine = 4.3426 + 0.1188 * rh - 0.0211 * temp
 End Function
 
-Public Function FA_pine(DF, KBDI, WAF As Single) As Single
-    ' returns amount of fuel available to burn
-    ' From Cruz et al. (2022) Vesta Mk 2 model
-    ' 
-    ' args
-    '   DF: drought factor
-    '   KBDI: Keetch Byram drought index KBDI
-    '   WAF: wind adjustment factor restricted to range 3 to 5
+Public Function FA_pine(DF, DI, WAF As Single) As Single
+    ''' returns fuel availability estimates using drought factor
+    ''' From Cruz et al. (2022) Vesta Mk 2 model
+    '''
+    ''' args
+    '''   DF: drought factor
+    '''   DI: Drought IndexKeetch Byram drought index KBDI
+    '''   WAF: wind adjustment factor restricted to range 3 to 5
     
-    C1 = 0.1 * ((0.0046 * Power(WAF, 2) - 0.0079 * WAF - 0.0175) * KBDI + (-0.9167 * Power(WAF, 2) + 1.5833 * WAF + 13.5))
+    C1 = 0.1 * ((0.0046 * Power(WAF, 2) - 0.0079 * WAF - 0.0175) * DI + (-0.9167 * Power(WAF, 2) + 1.5833 * WAF + 13.5))
     C1 = WorksheetFunction.Max(C1, 0)
     C1 = WorksheetFunction.Min(C1, 1)
 
     
-    FA_pine = 1.008 / (1 + 104.9 * Exp(-0.9306 * C1 * DF))   
+    FA_pine = 1.008 / (1 + 104.9 * Exp(-0.9306 * C1 * DF))
 End Function
 
 Public Function U_flame_height(U_10, h_o As Single) As Single
-    ' return wind speed at flame height (km/r) based on Cruz et al. 2006
-    ' 
-    ' args
-    '   U_10: 10 m wind speed (km/h)
-    '   h_o: stand (overstorey) height m
+    ''' returns wind speed at flame height (km/h) based on Cruz et al. 2006
+    '''
+    ''' args
+    '''   U_10: 10 m wind speed (km/h)
+    '''   h_o: stand (overstorey) height m
     
     Dim U_stand_height As Single 'wind speed at stand height
     U_stand_height = U_10 * Log((0.36 * h_o) / (0.13 * h_o)) / Log((10 + 0.36 * h_o) / (0.13 * h_o))
@@ -48,20 +48,19 @@ End Function
 Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     ParamArray fuel_models() As Variant _
     ) As Variant()
-    ' return array of the the forward rate of spread (m/h), intensity (kW/m) 
-    ' and flame height (m) for pine based on Cruz model
-    ' 
-    ' args
-    '   U_10: 10 m wind speed (km/h)
-    '   mc: dead fuel moisture content (%)
-    '   DF: drought factor
-    '   KBDI: Keetch Byram drought index KBDI
-    '   fuel_models array comprising
-    '     wrf: wind adjustment factor restricted to range 3 to 5
-    '     fl_s: surface fuel load (t/ha)
-    '     fl_o: overstorey (canopy) fuel load (t/ha)
-    '     bh_o: overstorey (canopy) base height (m)
-    '     bd_o: overstorey (canopy) bulk density
+    ''' returns array of the the forward rate of spread m/h, intensity kW/m and flame height m for pine based on Cruz model
+    '''
+    ''' args
+    '''   U_10: 10 m wind speed (km/h)
+    '''   mc: dead fuel moisture content %
+    '''   DF: drought factor
+    '''   KBDI: Keetch Byram drought index KBDI
+    '''   fuel_models array comprising
+    '''     wrf: wind adjustment factor restricted to range 3 to 5
+    '''     fl_s: surface fuel load (t/ha)
+    '''     fl_o: overstorey (canopy) fuel load (t/ha)
+    '''     bh_o: overstorey (canopy) base height m
+    '''     bd_o: overstorey (canopy) bulk density
     
     'fuel parameters
     If UBound(fuel_models) < 4 Then 'fuel_models array is empty or imcomplete, use defaults
@@ -107,18 +106,18 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     
     E = 0.715 * Exp(-0.000359 * surface_volume_ratio)
     B = 0.02562 * Power(surface_volume_ratio, 0.54)
-    C = 7.47 * Exp(-0.133 * Power(surface_volume_ratio, 0.55))
+    c = 7.47 * Exp(-0.133 * Power(surface_volume_ratio, 0.55))
     packing_ratio_op = 3.348 * Power(surface_volume_ratio, -0.8189) 'Optimum packing ratio
-    wind_coefficient = C * Power(wind_mid_flame * 54.68, B) * Power(packing_ratio / packing_ratio_op, -E)
+    wind_coefficient = c * Power(wind_mid_flame * 54.68, B) * Power(packing_ratio / packing_ratio_op, -E)
 
     xi = Power(192 + 0.2595 * surface_volume_ratio, -1) * Exp((0.792 * 0.681 * Power(surface_volume_ratio, 0.5)) * (packing_ratio + 0.1)) 'Propagating flux ratio
 
     eta_S = 0.174 * Power(mineral_content_silica_free, -0.19) 'Mineral damping coefficient
     eta_M = 1 - 2.59 * moisture_fraction / moisture_fraction_extinction + 5.11 * Power(moisture_fraction / moisture_fraction_extinction, 2) - 3.52 * Power(moisture_fraction / moisture_fraction_extinction, 3) 'Moisture damping coefficient
 
-    A = 1 / (4.77 * Power(surface_volume_ratio, 0.1) - 7.27)
+    a = 1 / (4.77 * Power(surface_volume_ratio, 0.1) - 7.27)
     gamma_max = Power(surface_volume_ratio, 1.5) / (495 + 0.0594 * Power(surface_volume_ratio, 1.5)) 'Maximum reaction velocity
-    Gamma = gamma_max * Power((packing_ratio / packing_ratio_op), A) * Exp(A * (1 - packing_ratio / packing_ratio_op)) 'Optimum reaction velocity
+    Gamma = gamma_max * Power((packing_ratio / packing_ratio_op), a) * Exp(a * (1 - packing_ratio / packing_ratio_op)) 'Optimum reaction velocity
 
     reaction_intensity = Gamma * net_fuel_load_IMP * heat_of_combustion_IMP * eta_M * eta_S 'Btu/ft^2 min
 
@@ -173,7 +172,7 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     fire_behaviour_array(0) = ROS
     fire_behaviour_array(1) = Intensity_total
     fire_behaviour_array(2) = flame_height
-    fire_behaviour_pine = fire_behaviour_array   
+    fire_behaviour_pine = fire_behaviour_array
 End Function
 
 Public Function ROS_pine(U_10, mc, DF, KBDI) As Single
@@ -195,17 +194,18 @@ Public Function FH_pine(U_10, mc, DF, KBDI) As Single
 End Function
 
 Public Function fb_pine_ensemble(U_10, mc, DF, KBDI) As Variant()
-    ' return array of the the forward rate of spread (m/h), intensity (kW/m) 
-    ' and flame height (m) for pine using an mixed stand ensemble
-    'args
-    '  U_10: 10 m wind speed (km/h)
-    '  mc: dead fuel moisture content %
-    '  DF: drought factor
-    '  KBDI: Keetch Byram drought index KBDI
+    ''' returns array of the the forward rate of spread (m/h), intensity (kW/m) and flame height (m) for pine using an mixed stand ensemble
+    '''
+    ''' args
+    '''   U_10: 10 m wind speed (km/h)
+    '''   mc: dead fuel moisture content %
+    '''   DF: drought factor
+    '''   KBDI: Keetch Byram drought index KBDI
     
     Dim fb_array() As Variant
     Dim fuel_array() As Variant
     Dim fuel_model_() As Variant
+
     
     'initialise
     Dim grass_proportion As Single: grass_proportion = 0.091
@@ -247,7 +247,6 @@ Public Function fb_pine_ensemble(U_10, mc, DF, KBDI) As Variant()
     fb_pine_ensemble = fire_behaviour_array
     'fb_pine_ensemble = result_array
 End Function
-
 
 
 
