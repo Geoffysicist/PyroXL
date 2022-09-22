@@ -1,4 +1,4 @@
-from spread_models import mallee_heath
+from spread_models import mallee_heath_mod
 import test_data_generator as tdg
 import pandas as pd
 
@@ -33,13 +33,13 @@ df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
 df['months'] = df.datetime.dt.month
 df['hours'] = df.datetime.dt.hour
 
-output_dict =mallee_heath.calculate(df.to_xarray(),fuel_params_df.iloc[0])
+output_dict =mallee_heath_mod.calculate(df.to_xarray(),fuel_params_df.iloc[0])
 
 for param, series in output_dict.items():
     df[param] = series
 
 print(df.head())
 print(df.shape)
-df.to_csv('tests/mallee_heath_small.csv', index=False)
+df.to_csv('tests/mallee_heath_mod.csv', index=False)
 # df.to_pickle('mallee_heath_small.pkl')
 

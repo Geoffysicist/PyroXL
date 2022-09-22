@@ -8,6 +8,10 @@
 
 ### Public Function Power(coefficient, exponent) As Double
 
-### Public Sub test(arg1 As Integer, ParamArray p_array() As Variant)
+### Public Function cardinal_to_degrees(ByVal cardinal As String) As Single
+     returns a compass direction in degrees
+     args
+       cardinal: a cardinal direction (N, NNE, NE, ENE, E, ESE, SE, SSE,
+                                       S, SSW, SW, WSW, W, WNW, NW, NNW)
 
-### Public Sub test2()
+### Public Function backbearing(ByVal bearing As Variant) As Single

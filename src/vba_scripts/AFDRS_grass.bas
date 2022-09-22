@@ -1,18 +1,17 @@
 Attribute VB_Name = "AFDRS_grass"
 Public Function FMC_grass(temp, rh As Single) As Single
-    ''' returns the grass fuel moisture content as (%) based on McArthur (1966)
-    ''' 
-    ''' args
+    ''' returns the grass fuel moisture content (%) based on McArthur (1966)
+    '''
+    ''' args:
     '''   temp: air temperature (C)
     '''   rh: relative humidity (%)
     
     FMC_grass = 9.58 - 0.205 * temp + 0.138 * rh
     FMC_grass = WorksheetFunction.Max(FMC_grass, 5)
 End Function
-
 Public Function curing_coeff_grass(curing As Single) As Single
     ''' returns the curing coefficient based on Cruz et al. (2015)
-    ''' 
+    '''
     ''' args
     '''   curing: degree of grass curing (%)
     
@@ -21,7 +20,7 @@ End Function
 
 Public Function moist_coeff_grass(U_10, mc As Single) As Single
     ''' returns the grass moisture coefficient
-    ''' 
+    '''
     ''' args
     '''   U_10: 10 m wind speed (km/h)
     '''   mc: fuel moisture content (%)
@@ -42,6 +41,7 @@ End Function
 
 Public Function ROS_grass(U_10, mc As Single, curing As Single, state As String) As Single
     ''' returns the forward ROS (m/h) ignoring slope
+    '''
     ''' args
     '''   U_10: 10 m wind speed (km/h)
     '''   mc: fuel moisture content (%)
@@ -79,7 +79,7 @@ End Function
 
 Public Function Flame_height_grass(ROS As Single, state As String) As Single
     ''' returns the flame height (m) based on M. Plucinski, pers. comm.
-    ''' 
+    '''
     ''' args
     '''   ROS: forward rate of spread (m/h)
     '''   state: grass state (natural, grazed, eaten-out)
@@ -97,13 +97,28 @@ Public Function Flame_height_grass(ROS As Single, state As String) As Single
     End Select
 End Function
 
-Public Function enumerate_state_grass(state As String) As Integer
-    ''' returns an enumerated value for grass state
-    ''' eaten-out = 1, grazed = 2, natural = 3
-    ''' 
+Public Function state_to_load_grass(state As String) As Single
+    ''' returns the grass fuel load (t/ha)
+    '''
     ''' args
-    '''   the grass state
+    '''   state: the grass fuel state - eaten-out, grazed or natural
+    
+    Select Case state
+        Case "natural"
+            state_to_load_grass = 6
+        Case "grazed"
+            state_to_load_grass = 4.5
+        Case "eaten-out"
+            state_to_load_grass = 1.5
+    End Select
+End Function
 
+Public Function enumerate_state_grass(state As String) As Integer
+    ''' returns an enumerated value of the grass fuel state
+    '''
+    ''' args
+    '''   state: the grass fuel state - eaten-out, grazed or natural
+    
     Select Case state
         Case "natural"
             enumerate_state_grass = 3
@@ -112,15 +127,14 @@ Public Function enumerate_state_grass(state As String) As Integer
         Case "eaten-out"
             enumerate_state_grass = 1
     End Select
-
 End Function
-Public Function categorise_state_grass(state As Integer) As String
-    ''' returns an category string for grass state
-    ''' 1 = eaten-out, 2 = grazed, 3 = natural
-    ''' 
-    ''' args
-    '''   the grass state
 
+Public Function categorise_state_grass(state As Integer) As String
+    ''' returns an categorical value of the grass fuel state
+    '''
+    ''' args
+    '''   state: the grass fuel state - 1=eaten-out, 2=grazed or 3=natural
+    
     Select Case state
         Case 3
             categorise_state_grass = "natural"
@@ -129,5 +143,4 @@ Public Function categorise_state_grass(state As Integer) As String
         Case 1
             categorise_state_grass = "eaten-out"
     End Select
-
 End Function
