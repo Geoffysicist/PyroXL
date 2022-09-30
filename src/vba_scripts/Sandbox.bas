@@ -1,35 +1,25 @@
 Attribute VB_Name = "Sandbox"
-Private Sub sandbox()
-    temp = backbearing("n")
-    MsgBox temp
-End Sub
-
-
-Public Sub test(arg1 As Integer, ParamArray p_array() As Variant)
-    Dim this_array, that_array, big_array As Variant
+Public Function ROS_heath_raw(U_10, h_el, mc As Double, overstorey As Boolean) As Double
+    ''' returns forward rate of spread (m/h) [range: 0-6000 m/h]
+    ''' Anderson, W. R., et al. (2015). "A generic, empirical-based model for predicting rate of fire
+    ''' spread in shrublands." International Journal of Wildland Fire 24(4): 443-460.
+    '''
+    ''' args
+    '''   U_10: 10 m wind speed (km/h)
+    '''   h_el: elevated fuel height (m)
+    '''   mc: fuel moisture content (%)
+    '''   overstorey: presence or absence of woodland overstorey (true/false)
     
-    If UBound(p_array) < LBound(p_array) Then
-        MsgBox "empty"
-        p_array = Array(1, 2, 3, 4)
-    Else
-        MsgBox p_array(1)
+    Dim Mf As Double 'fuel moisture factor
+    Mf = Mf_heath(mc)
+    
+    'wrf depends on presence or absence of woodland overstorey
+    Dim wrf As Double: wrf = 0.667
+     
+    If overstorey = True Then
+        wrf = 0.35
     End If
     
-    If UBound(p_array) < LBound(p_array) Then
-        MsgBox "empty"
-    Else
-        MsgBox p_array(1)
-    End If
-    this_array = Array(1, 2, 3, 4)
-    that_array = Array(5, 6, 7, 8)
-    big_array = Array(this_array, that_array)
-
-End Sub
-
-Public Sub test2()
-    Dim a As Variant
-    a = Array(1, 2, 3, 4, 1, 2, 3, 4, 5)
-    Dim index As Integer
-    MsgBox Application.Match(4, a, 0)
-End Sub
-
+    
+    ROS_heath = 5.6715 * (wrf * U_10) ^ 0.912 * h_el ^ 0.227 * Mf * 60
+End Function

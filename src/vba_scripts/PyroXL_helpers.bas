@@ -27,6 +27,7 @@ Private Sub Save_Distro()
             ws.Protect UserInterfaceOnly:=True
             ws.Visible = False
         Else
+            ws.Unprotect
             ws.EnableCalculation = True
             ws.Protect UserInterfaceOnly:=True
         End If
@@ -38,7 +39,7 @@ End Sub
 Public Sub export_modules()
     Dim path, fn As String
     
-    path = ThisWorkbook.path & "\src\"
+    path = ThisWorkbook.path & "\src\vba_scripts\"
     
     For Each cmp In ThisWorkbook.VBProject.VBComponents
         Select Case cmp.Type

@@ -1,37 +1,43 @@
 Attribute VB_Name = "AFDRS_General"
 Public Sub set_defaults()
-    Range("A15").Value = Date 'date (formatted)
-    Range("B15").Value = time 'time (formatted)
-    Range("C15").Value = 25 'temp
-    Range("D15").Value = 30 'RH
-    Range("E15").Value = "N" 'wind direction
-    Range("F15").Value = 20 'wind speed
-    Range("G13").Value = 100 'KBDI
-    Range("G15").Value = 8 'DF
-    Range("J2").Value = 3 'WAF
-    Range("J10").Value = 20 'forest h_ns
-    Range("J11").Value = 2 'forest h_el
-    Range("J12").Value = 20 'forest h_o
-    Range("K4").Value = 10 'forest fl_s
-    Range("K5").Value = 3.5 'forest fl_ns
-    Range("K6").Value = 2 'forest fl_e
-    Range("K7").Value = 2 'forest fl_b
-    Range("K8").Value = 4.5 'forest fl_o
-    Range("M10").Value = "dry" 'forest submodel
-    Range("P3").Value = "grazed" 'grass state
-    Range("P4").Value = 80 'grass curing
-    Range("X2").Value = 0 'heath precipation last 48 hours
-    Range("X3").Value = 48 'heath time since rain
-    Range("X4").Value = False 'heath presence of overstorey
-    Range("X5").Value = 2 'heath h_el
-    Range("X6").Value = 25 'heath  time since fire
-    Range("AH2").Value = 3 'mallee fl_s
-    Range("AH3").Value = 1 'mallee fl_o
-    Range("AH4").Value = 18 'mallee Cov_o
-    Range("AH5").Value = 4.5 'mallee H_o
-    Range("AH6").Value = 20 'mallee time since fire
-    Range("AH7").Value = 0 'mallee precipation last 48 hours
-    Range("AH8").Value = 48 'mallee time since rain
+    Range("current_date").Value = Date 'date (formatted)
+    Range("current_time").Value = time 'time (formatted)
+    Range("date_row1").Value = Date 'date (formatted)
+    Range("time_row1").Value = time 'time (formatted)
+    Range("temp_row1").Value = 25 'temp
+    Range("rh_row1").Value = 30 'RH
+    Range("wind_dir_row1").Value = "N" 'wind direction
+    Range("wind_mag_row1").Value = 20 'wind speed
+    Range("kbdi").Value = 100 'KBDI
+    Range("df_row1").Value = 8 'DF
+    Range("waf_forest").Value = 3 'WAF Forest
+    Range("h_ns_forest").Value = 20 'forest h_ns
+    Range("h_e_forest").Value = 2 'forest h_el
+    Range("h_o_forest").Value = 20 'forest h_o
+    Range("fl_s_forest").Value = 10 'forest surface fuel load
+    Range("fl_ns_forest").Value = 3.5 'forest fl_ns
+    Range("fl_e_forest").Value = 2 'forest fl_e
+    Range("fl_b_forest").Value = 2 'forest fl_b
+    Range("fl_o_forest").Value = 4.5 'forest fl_o
+    Range("submodel_forest").Value = "dry" 'submodel_forest
+    Range("state_grass").Value = "grazed" 'grass state
+    Range("curing_grass").Value = 80 'grass curing
+    Range("subtype_woodland").Value = "woodland" 'woodland subtype
+    Range("fl_woodland").Value = 4.5 'woodland grass fuel load
+    Range("curing_woodland").Value = 80 'grass curing
+    Range("waf_woodland").Value = 0.5 'woodland wind adjustment factor
+    Range("rain_heath").Value = 0 'heath precipation last 48 hours
+    Range("tsr_heath").Value = 48 'heath time since rain
+    Range("overstorey_heath").Value = False 'heath presence of overstorey
+    Range("h_el_heath").Value = 2 'elevated fuel height
+    Range("tsf_heath").Value = 25 'heath  time since fire
+    Range("fl_s_mallee").Value = 3 'mallee fl_s
+    Range("fl_o_mallee").Value = 1 'mallee fl_o
+    Range("cov_o_mallee").Value = 18 'mallee Cov_o
+    Range("h_o_mallee").Value = 4.5 'mallee H_o
+    Range("tsf_mallee").Value = 20 'mallee time since fire
+    Range("rain_mallee").Value = 0 'mallee precipation last 48 hours
+    Range("tsr_mallee").Value = 48 'mallee time since rain
 End Sub
 
 Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
@@ -64,7 +70,7 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
             intensity_b = Array(0, 100, 3000, 9000, 17500, 25000) 'intensity_b and fbi_b must have same dimensions
         Case "heath"
             intensity_b = Array(0, 50, 500, 4000, 20000, 40000) 'intensity_b and fbi_b must have same dimensions
-        Case "savannah"
+        Case "savannah", "woodland"
             intensity_b = Array(0, 100, 3000, 9000, 17500, 25000) 'intensity_b and fbi_b must have same dimensions
         Case "pine"
             intensity_b = Array(0, 100, 750, 4000, 10000, 30000) 'intensity_b and fbi_b must have same dimensions

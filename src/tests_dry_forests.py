@@ -54,5 +54,5 @@ for param, series in output_dict.items():
 
 print(df.head())
 print(df.shape)
-df.to_csv('tests/dry_forest_small.csv', index=False)
+# df.to_csv('datasets/dry_forest_small.csv', index=False)
 # df.to_pickle('tests/dry_forest_small.pkl')
