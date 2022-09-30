@@ -177,6 +177,7 @@ Public Function fuel_availability_forest(DF, Optional DI = 100, Optional WAF = 3
         C1 = WorksheetFunction.Max(C1, 0)
         C1 = WorksheetFunction.Min(C1, 1)
         fuel_availability_forest = 1.008 / (1 + 104.9 * Exp(-0.9306 * C1 * DF))
+        fuel_availability_forest = WorksheetFunction.Min(fuel_availability_forest, DF * 0.1) 'shouldn't get higher ros for wet when WAF is low
     End If
 End Function
 

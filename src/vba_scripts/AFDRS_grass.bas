@@ -97,6 +97,20 @@ Public Function Flame_height_grass(ROS As Single, state As String) As Single
     End Select
 End Function
 
+Public Function Intensity_grass(ByVal ROS As Double, ByVal fuel_load As Single) As Double
+    ''' returns the fireline intensity (kW/m) based on Byram 1959
+    ''' for grass fuel loads are limited to range 1 to 6 t/ha
+    '''
+    ''' args
+    '''   ROS: forward rate of spread (km/h)
+    '''   fuel_load: fine fuel load (t/ha)
+    
+    'limit fuel load to range 1 - 6
+    fuel_load = WorksheetFunction.Max(1, fuel_load)
+    fuel_load = WorksheetFunction.Min(6, fuel_load)
+    Intensity_grass = intensity(ROS, fuel_load)
+End Function
+
 Public Function state_to_load_grass(state As String) As Single
     ''' returns the grass fuel load (t/ha)
     '''
@@ -110,6 +124,22 @@ Public Function state_to_load_grass(state As String) As Single
             state_to_load_grass = 4.5
         Case "eaten-out"
             state_to_load_grass = 1.5
+    End Select
+End Function
+
+Public Function load_to_state_grass(load As Single) As String
+    ''' returns the grass fuel state - eaten-out, grazed or natural
+    '''
+    ''' args
+    '''   load: the grass fuel load (t/ha)
+    
+    Select Case load
+        Case Is >= 6
+            load_to_state_grass = "natural"
+        Case Is < 3
+            load_to_state_grass = "eaten-out"
+        Case Else
+            load_to_state_grass = "grazed"
     End Select
 End Function
 
