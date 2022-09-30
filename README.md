@@ -13,6 +13,9 @@ A rudimentary guide to the VBA user defined functions can be found in the docs/g
 
 If you use this code in other projects please acknowledge the author and NSW Rural Fire Service.
 
+## Change log
+ - 20220930: added woodlands model. models now implemented include forest, grassland, woodland, heath, pine and mallee
+
 ## DISCLAIMER
 This calculator should be used with caution. The accuracy of calculations will be impacted by the accuracy of the input data.  Potential sources of error in these calculations could include (but are not limited to): incorrect or invalid weather observations, incorrect or invalid fuel observations, missing or unknown antecedent conditions (e.g. previous rainfall or time since fire).
 
