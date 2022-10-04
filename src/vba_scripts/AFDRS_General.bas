@@ -38,6 +38,12 @@ Public Sub set_defaults()
     Range("tsf_mallee").Value = 20 'mallee time since fire
     Range("rain_mallee").Value = 0 'mallee precipation last 48 hours
     Range("tsr_mallee").Value = 48 'mallee time since rain
+    Range("AWAP_uf").Value = 0 'soil moisture factor
+    Range("tsf_spinifex").Value = 25 'spinifex time since fire
+    Range("rain_spinifex").Value = 0 'spinifex precipation last 48 hours
+    Range("tsr_spinifex").Value = 48 'spinifex time since rain
+    Range("productivity_spinifex").Value = 1 'arid = 1, low rainfall = 2, high rainfall = 3
+    Range("subtype_spinifex").Value = "open" 'spinifex subtype
 End Sub
 
 Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
@@ -74,6 +80,10 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
             intensity_b = Array(0, 100, 3000, 9000, 17500, 25000) 'intensity_b and fbi_b must have same dimensions
         Case "pine"
             intensity_b = Array(0, 100, 750, 4000, 10000, 30000) 'intensity_b and fbi_b must have same dimensions
+        Case "spinifex"
+            'actually uses ROS (m/h) but uses the same process so for simplicity label it here as intensity
+            intensity_b = Array(0, 0.1, 50, 1300, 7500, 10750)
+            intensity_ha = 20000
         Case Else
             MsgBox "invalid fuel type"
             Exit Function

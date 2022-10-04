@@ -91,6 +91,22 @@ Public Sub trim_output(input_row1, output_row1 As Range)
     End If
 
 End Sub
+
+Public Sub list_names()
+    Dim sht As Worksheet
+    Dim nm As Name
+    
+    Set Sheet = ActiveSheet
+    this_row = 2
+    col_name = "F"
+    col_address = "G"
+    For Each nm In Names
+        Worksheets("tables").Range(col_name & this_row).Value = nm.Name
+        Worksheets("tables").Range(col_address & this_row).Value = Range(nm.Name).Address
+        this_row = this_row + 1
+    Next nm
+End Sub
+
 Public Function Power(coefficient, exponent) As Double
     'returns the coefficient raised to the power of the exponent
     'to make life easier translating python :)
@@ -144,3 +160,4 @@ Public Function backbearing(ByVal bearing As Variant) As Single
         backbearing = bearing - 180
     End If
 End Function
+
