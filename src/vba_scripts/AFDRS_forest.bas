@@ -1,7 +1,7 @@
 Attribute VB_Name = "AFDRS_forest"
 Public Function Intensity_forest( _
         ROS, DF, flame_h, fl_s, fl_ns, fl_e, fl_o, h_o, _
-        Optional WAF = 3, Optional DI = 100, Optional submodel = "dry" _
+        Optional waf = 3, Optional DI = 100, Optional submodel = "dry" _
         ) As Double
     ''' return the intensity based on fuel load and ROS
     ''' note AFDRS caps surface fuel load at 10 t/ha (1 kg/m)
@@ -22,7 +22,7 @@ Public Function Intensity_forest( _
     Dim flame_h_crown_frac As Double: flame_h_crown_frac = 0.66 'dimensionless
     
     'modify fuel parameters with fuel availability
-    fuel_avail = fuel_availability_forest(DF, DI, WAF, submodel)
+    fuel_avail = fuel_availability_forest(DF, DI, waf, submodel)
     fl_s = fl_s * fuel_avail
     fl_ns = fl_ns * fuel_avail
     fl_e = fl_e * fuel_avail
@@ -55,7 +55,7 @@ Public Function Flame_height_forest(ROS As Double, h_el As Single) As Single
     Flame_height_forest = 0.0193 * ROS ^ 0.723 * Exp(h_el * 0.64) * 1.07
 End Function
 
-Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, WAF, Optional DI = 100, Optional submodel = "dry") As Double
+Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, waf, Optional DI = 100, Optional submodel = "dry") As Double
     ''' returns the forward ROS (m/h) ignoring slope
     '''
     ''' args
@@ -74,16 +74,16 @@ Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, WAF, Optional DI 
     h_ns = WorksheetFunction.Min(h_ns, 20#)
     
     
-    Dim Mf As Double 'moisture function
-    Mf = Mf_forest((fmc))
+    Dim mf As Double 'moisture function
+    mf = Mf_forest((fmc))
     
     'modify fuel parameters with fuel availability
-    fuel_avail = fuel_availability_forest(DF, DI, WAF, submodel)
+    fuel_avail = fuel_availability_forest(DF, DI, waf, submodel)
     fhs_s = fhs_s * fuel_avail
     fhs_ns = fhs_ns * fuel_avail
     
     'apply wind reduction factor
-    wind_speed = U_10 * 3# / WAF
+    wind_speed = U_10 * 3# / waf
     
     'calculate ROS for 7% moisture
     If wind_speed > wind_threshold Then
@@ -93,7 +93,7 @@ Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, WAF, Optional DI 
     End If
     
     'apply moisture factor
-    ROS_forest = ROS_forest * Mf
+    ROS_forest = ROS_forest * mf
 End Function
 
 Public Function FMC_forest(temp, rh As Single, date_ As Date, time As Date, Optional submodel = "dry") As Double
@@ -161,7 +161,7 @@ Public Function Spotting_forest(ROS, U_10, fhs_s As Single) As Integer
     End If
 End Function
 
-Public Function fuel_availability_forest(DF, Optional DI = 100, Optional WAF = 3, Optional submodel = "dry") As Double
+Public Function fuel_availability_forest(DF, Optional DI = 100, Optional waf = 3, Optional submodel = "dry") As Double
     ''' returns the fuel availability - proportion of fuel available to be burnt
     '''
     ''' args
@@ -173,7 +173,7 @@ Public Function fuel_availability_forest(DF, Optional DI = 100, Optional WAF = 3
     If submodel = "dry" Then
         fuel_availability_forest = DF * 0.1
     ElseIf submodel = "wet" Then
-        C1 = 0.1 * ((0.0046 * Power(WAF, 2) - 0.0079 * WAF - 0.0175) * DI + (-0.9167 * Power(WAF, 2) + 1.5833 * WAF + 13.5))
+        C1 = 0.1 * ((0.0046 * Power(waf, 2) - 0.0079 * waf - 0.0175) * DI + (-0.9167 * Power(waf, 2) + 1.5833 * waf + 13.5))
         C1 = WorksheetFunction.Max(C1, 0)
         C1 = WorksheetFunction.Min(C1, 1)
         fuel_availability_forest = 1.008 / (1 + 104.9 * Exp(-0.9306 * C1 * DF))
