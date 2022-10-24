@@ -38,11 +38,11 @@ datetime_param_dict = {
 }
 
 num_param_dict = {
-    'WindMagKmh_SFC': (10,50,20),
-    'RH_SFC': (10,100,20),
-    'T_SFC': (0,45,15),
+    # 'WindMagKmh_SFC': (10,50,20),
+    # 'RH_SFC': (32,32,1),
+    # 'T_SFC': (33.4,33.4,1),
     # 'Td_SFC': (0,30,15),
-    'Curing_SFC': (0,100,25),
+    # 'Curing_SFC': (91,91,1),
     # 'precipitation': (0,100,50),
     # 'time_since_rain': (0,48,24),
     # 'time_since_fire': (0,15,7.5),
@@ -54,8 +54,12 @@ num_param_dict = {
 }
 
 class_param_dict = {
-        'grass_condition': (1,2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
-        'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
+        'WindMagKmh_SFC': (25,26),
+        'RH_SFC': (32,33),
+        'T_SFC': (33.4,34),
+        'Curing_SFC': (91,92),
+        'grass_condition': (3,2), # 1 = eaten-out, 2 = grazed, 3 = natural
+        'GrassFuelLoad_SFC': (6.1,6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
 }
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
@@ -69,5 +73,5 @@ for param, series in output_dict.items():
 
 print(df.head())
 print(df.shape)
-df.to_csv('tests/pasture_small.csv', index=False)
+df.to_csv('tests/pasture_musa.csv', index=False)
 # df.to_pickle('tests/pasture_small.pkl')
