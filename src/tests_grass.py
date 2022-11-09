@@ -32,10 +32,10 @@ datetime_param_dict = {
 }
 
 num_param_dict = {
-    'WindMagKmh_SFC': (10,50,10),
-    'RH_SFC': (10,100,25),
-    'T_SFC': (10,40,10),
-    'Curing_SFC': (0,100,20),
+    'WindMagKmh_SFC': (10,30,10),
+    'RH_SFC': (10,50,20),
+    'T_SFC': (10,40,15),
+    'Curing_SFC': (60,100,20),
     # 'precipitation': (0,100,50),
     # 'time_since_rain': (0,48,24),
     # 'time_since_fire': (0,15,7.5),

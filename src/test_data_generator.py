@@ -56,7 +56,11 @@ def generate_test_data(datetime_param_dict, num_param_dict, class_param_dict):
         df_array.append(pd.DataFrame(data=num_array, columns=[param]))
 
     for param, values in class_param_dict.items():
-        df_array.append(pd.DataFrame(data=values,columns=[param]))
+        try:
+            df_array.append(pd.DataFrame(data=values,columns=[param]))
+        except ValueError:
+            #if only one value in the tuple
+            df_array.append(pd.DataFrame(data=[values],columns=[param]))
 
     for df in df_array:
         if cartesian_df is None:

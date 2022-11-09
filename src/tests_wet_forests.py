@@ -20,7 +20,7 @@ fuel_params_dict = {
     # 'Cov_o': 40,
     'H_ns': 20,
     'H_el': 2,
-    'H_o': 20,
+    'H_o': 10,
     'WRF_For': 3,
     'FTno_State': 2000,
 }
@@ -29,26 +29,27 @@ fuel_params_df = pd.DataFrame(fuel_params_dict, index=[0])
 
 # small dataset
 datetime_param_dict = {
-    'datetime': ('2022-01-01', '2022-09-01', 90, 6),
+    'datetime': ('2022-11-01', '2022-12-01', 90, 6),
 }
 
 num_param_dict = {
-    'WindMagKmh_SFC': (10,50,20),
-    'RH_SFC': (10,100,50),
-    'T_SFC': (10,40,15),
-    # 'precipitation': (0,100,50),
-    # 'time_since_rain': (0,48,24),
-    'time_since_fire': (0,15,7.5),
-    'DF_SFC': (2,10,4),
-    'KBDI_SFC': (0,200,50),
 }
 
-class_param_dict = {}
+class_param_dict = {
+    'T_SFC': (25,25),
+    'RH_SFC': (30,30),
+    'WindMagKmh_SFC': (20,20),
+    'DF_SFC': (8,8),
+    'KBDI_SFC': (100,100),
+    'time_since_fire': (20,20),
+}
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
 df['months'] = df.datetime.dt.month
 df['hours'] = df.datetime.dt.hour
 df['SDI_SFC'] = df.KBDI_SFC
+
+print(df)
 
 output_dict =wet_forest.calculate(df.to_xarray(),fuel_params_df.iloc[0])
 
