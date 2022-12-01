@@ -28,14 +28,14 @@ fuel_params_df = pd.DataFrame(fuel_params_dict, index=[0])
 
 # small dataset
 datetime_param_dict = {
-    # 'datetime': ('2022-01-01', '2022-09-01', 90, 6),
+    'datetime': ('2022-01-01', '2022-09-01', 90, 6),
 }
 
 num_param_dict = {
-    'WindMagKmh_SFC': (10,30,10),
-    'RH_SFC': (10,50,20),
-    'T_SFC': (10,40,15),
-    'Curing_SFC': (60,100,20),
+    # 'WindMagKmh_SFC': (10,30,10),
+    # 'RH_SFC': (10,50,20),
+    # 'T_SFC': (10,40,15),
+    # 'Curing_SFC': (10,30,20),
     # 'precipitation': (0,100,50),
     # 'time_since_rain': (0,48,24),
     # 'time_since_fire': (0,15,7.5),
@@ -43,7 +43,12 @@ num_param_dict = {
 }
 
 class_param_dict = {
-        'grass_condition': (1,2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
+        'grass_condition': (2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
+        'WindMagKmh_SFC': (29,31),
+        'RH_SFC': (49,50),
+        'T_SFC': (13,14),
+        'Curing_SFC': (16,17,25),
+        
         # 'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
 }
 

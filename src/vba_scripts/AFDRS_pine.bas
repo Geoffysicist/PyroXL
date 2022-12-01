@@ -16,7 +16,7 @@ Public Function FMC_pine(temp, rh As Single) As Single
     FMC_pine = 4.3426 + 0.1188 * rh - 0.0211 * temp
 End Function
 
-Public Function FA_pine(DF, DI, waf As Single) As Single
+Public Function FA_pine(DF, DI, WAF As Single) As Single
     ''' returns fuel availability estimates using drought factor
     ''' From Cruz et al. (2022) Vesta Mk 2 model
     '''
@@ -25,7 +25,7 @@ Public Function FA_pine(DF, DI, waf As Single) As Single
     '''   DI: Drought IndexKeetch Byram drought index KBDI
     '''   WAF: wind adjustment factor restricted to range 3 to 5
     
-    C1 = 0.1 * ((0.0046 * Power(waf, 2) - 0.0079 * waf - 0.0175) * DI + (-0.9167 * Power(waf, 2) + 1.5833 * waf + 13.5))
+    C1 = 0.1 * ((0.0046 * Power(WAF, 2) - 0.0079 * WAF - 0.0175) * DI + (-0.9167 * Power(WAF, 2) + 1.5833 * WAF + 13.5))
     C1 = WorksheetFunction.Max(C1, 0)
     C1 = WorksheetFunction.Min(C1, 1)
 
