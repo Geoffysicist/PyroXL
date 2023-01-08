@@ -106,9 +106,9 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     
     E = 0.715 * Exp(-0.000359 * surface_volume_ratio)
     B = 0.02562 * Power(surface_volume_ratio, 0.54)
-    c = 7.47 * Exp(-0.133 * Power(surface_volume_ratio, 0.55))
+    C = 7.47 * Exp(-0.133 * Power(surface_volume_ratio, 0.55))
     packing_ratio_op = 3.348 * Power(surface_volume_ratio, -0.8189) 'Optimum packing ratio
-    wind_coefficient = c * Power(wind_mid_flame * 54.68, B) * Power(packing_ratio / packing_ratio_op, -E)
+    wind_coefficient = C * Power(wind_mid_flame * 54.68, B) * Power(packing_ratio / packing_ratio_op, -E)
 
     xi = Power(192 + 0.2595 * surface_volume_ratio, -1) * Exp((0.792 * 0.681 * Power(surface_volume_ratio, 0.5)) * (packing_ratio + 0.1)) 'Propagating flux ratio
 

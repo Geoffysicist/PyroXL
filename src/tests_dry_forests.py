@@ -32,15 +32,18 @@ datetime_param_dict = {
 }
 
 num_param_dict = {
+    'T_SFC': (20,40,5),
+    'RH_SFC': (10,40,5),
+    'WindMagKmh_SFC': (20,50,5),
 }
 
 class_param_dict = {
-    'T_SFC': (25,35),
-    'RH_SFC': (30,10),
-    'WindMagKmh_SFC': (20,30),
-    'DF_SFC': (8,8),
+    # 'T_SFC': (20,25,30,35,40),
+    # 'RH_SFC': (30,10),
+    # 'WindMagKmh_SFC': (20,30),
+    'DF_SFC': (8,9,10),
     # 'KBDI_SFC': (100,100),
-    'time_since_fire': (25,25),
+    'time_since_fire': (20,25),
 }
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
