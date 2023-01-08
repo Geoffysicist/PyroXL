@@ -31,10 +31,22 @@
        ROS: forward rate of spread (m/h)
        state: grass state (natural, grazed, eaten-out)
 
+### Public Function Intensity_grass(ByVal ROS As Double, ByVal fuel_load As Single) As Double
+     returns the fireline intensity (kW/m) based on Byram 1959
+     for grass fuel loads are limited to range 1 to 6 t/ha
+     args
+       ROS: forward rate of spread (km/h)
+       fuel_load: fine fuel load (t/ha)
+
 ### Public Function state_to_load_grass(state As String) As Single
      returns the grass fuel load (t/ha)
      args
        state: the grass fuel state - eaten-out, grazed or natural
+
+### Public Function load_to_state_grass(load As Single) As String
+     returns the grass fuel state - eaten-out, grazed or natural
+     args
+       load: the grass fuel load (t/ha)
 
 ### Public Function enumerate_state_grass(state As String) As Integer
      returns an enumerated value of the grass fuel state

@@ -195,7 +195,7 @@ Public Function intensity_spinifex(rate_of_spread, time_since_fire, productivity
     '''   productivity: based on the Carbon Farming Initiative mapping (CFI 2013), 1 arid fuels, 2 low rainfall, 3 high rainfall
     '''   subtype: "open" or "woodland"
     
-    fuel_load = fuel_load_spinifex(time_since_fire, productivity, subtype) / KGSQM_TO_TPH
+    fuel_load = fuel_load_spinifex(time_since_fire, productivity, subtype) '/ KGSQM_TO_TPH this conversion happens in intensity calc
     intensity_spinifex = intensity(rate_of_spread, fuel_load)
 End Function
 

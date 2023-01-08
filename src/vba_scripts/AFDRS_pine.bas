@@ -16,7 +16,7 @@ Public Function FMC_pine(temp, rh As Single) As Single
     FMC_pine = 4.3426 + 0.1188 * rh - 0.0211 * temp
 End Function
 
-Public Function FA_pine(DF, DI, waf As Single) As Single
+Public Function FA_pine(DF, DI, WAF As Single) As Single
     ''' returns fuel availability estimates using drought factor
     ''' From Cruz et al. (2022) Vesta Mk 2 model
     '''
@@ -25,7 +25,7 @@ Public Function FA_pine(DF, DI, waf As Single) As Single
     '''   DI: Drought IndexKeetch Byram drought index KBDI
     '''   WAF: wind adjustment factor restricted to range 3 to 5
     
-    C1 = 0.1 * ((0.0046 * Power(waf, 2) - 0.0079 * waf - 0.0175) * DI + (-0.9167 * Power(waf, 2) + 1.5833 * waf + 13.5))
+    C1 = 0.1 * ((0.0046 * Power(WAF, 2) - 0.0079 * WAF - 0.0175) * DI + (-0.9167 * Power(WAF, 2) + 1.5833 * WAF + 13.5))
     C1 = WorksheetFunction.Max(C1, 0)
     C1 = WorksheetFunction.Min(C1, 1)
 
@@ -106,9 +106,9 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     
     E = 0.715 * Exp(-0.000359 * surface_volume_ratio)
     B = 0.02562 * Power(surface_volume_ratio, 0.54)
-    c = 7.47 * Exp(-0.133 * Power(surface_volume_ratio, 0.55))
+    C = 7.47 * Exp(-0.133 * Power(surface_volume_ratio, 0.55))
     packing_ratio_op = 3.348 * Power(surface_volume_ratio, -0.8189) 'Optimum packing ratio
-    wind_coefficient = c * Power(wind_mid_flame * 54.68, B) * Power(packing_ratio / packing_ratio_op, -E)
+    wind_coefficient = C * Power(wind_mid_flame * 54.68, B) * Power(packing_ratio / packing_ratio_op, -E)
 
     xi = Power(192 + 0.2595 * surface_volume_ratio, -1) * Exp((0.792 * 0.681 * Power(surface_volume_ratio, 0.5)) * (packing_ratio + 0.1)) 'Propagating flux ratio
 

@@ -23,7 +23,7 @@ Private Sub Save_Distro()
     For Each ws In ThisWorkbook.Worksheets
         If InStr(ws.Name, "tests_") > 0 Then
             ws.Delete
-        ElseIf InStr(ws.Name, "tables") > 0 Then
+        ElseIf InStr(ws.Name, "models") > 0 Then
             ws.Protect UserInterfaceOnly:=True
             ws.Visible = False
         Else

@@ -10,8 +10,8 @@ Public Function ROS_heath_raw(U_10, h_el, mc As Double, overstorey As Boolean) A
     '''   mc: fuel moisture content (%)
     '''   overstorey: presence or absence of woodland overstorey (true/false)
     
-    Dim mf As Double 'fuel moisture factor
-    mf = Mf_heath(mc)
+    Dim Mf As Double 'fuel moisture factor
+    Mf = Mf_heath(mc)
     
     'wrf depends on presence or absence of woodland overstorey
     Dim wrf As Double: wrf = 0.667
@@ -21,5 +21,5 @@ Public Function ROS_heath_raw(U_10, h_el, mc As Double, overstorey As Boolean) A
     End If
     
     
-    ROS_heath = 5.6715 * (wrf * U_10) ^ 0.912 * h_el ^ 0.227 * mf * 60
+    ROS_heath = 5.6715 * (wrf * U_10) ^ 0.912 * h_el ^ 0.227 * Mf * 60
 End Function

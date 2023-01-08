@@ -6,6 +6,8 @@
 
 ### Public Sub trim_output(input_row1, output_row1 As Range)
 
+### Public Sub list_names()
+
 ### Public Function Power(coefficient, exponent) As Double
 
 ### Public Function cardinal_to_degrees(ByVal cardinal As String) As Single

@@ -9,6 +9,7 @@ Public Sub set_defaults()
     Range("wind_dir_row1").Value = "N" 'wind direction
     Range("wind_mag_row1").Value = 20 'wind speed
     Range("kbdi").Value = 100 'KBDI
+    Range("tsf").Value = 20 'Time since fire
     Range("df_row1").Value = 8 'DF
     Range("waf_forest").Value = 3 'WAF Forest
     Range("h_ns_forest").Value = 20 'forest h_ns

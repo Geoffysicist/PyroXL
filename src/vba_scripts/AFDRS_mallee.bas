@@ -27,10 +27,10 @@ Public Function FMC_mallee( _
     end_peak_month = 3 'March
     start_afternoon = 12
     end_afternoon = 17
-    HEAT_CONTENT = 18600 'KJ/kg
-    KGSQM_TO_TPH = 10#
-    SECONDS_PER_HOUR = 3600 's
-    FLAME_HEIGHT_CROWN_FRACTION = 0.66 'm
+    'HEAT_CONTENT = 18600 'kJ/kg 'TODO how did this stuff end up in here?
+    'KGSQM_TO_TPH = 10#
+    'SECONDS_PER_HOUR = 3600 's
+    'FLAME_HEIGHT_CROWN_FRACTION = 0.66 'm
     months = Month(date_)
     hours = Hour(time)
     
@@ -204,10 +204,7 @@ Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, intensit
                     fbi_la = fbi_b(2)
             End Select
     End Select
-
-    
+   
     FBI_mallee = fbi_la + (fbi_ua - fbi_la) * (param - param_la) / (param_ua - param_la)
     FBI_mallee = Int(FBI_mallee) 'FBI needs to be truncated for National consistency
-
-    
 End Function
