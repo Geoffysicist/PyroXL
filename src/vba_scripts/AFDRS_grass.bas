@@ -15,7 +15,7 @@ Public Function curing_coeff_grass(curing As Single) As Single
     ''' args
     '''   curing: degree of grass curing (%)
     
-    curing_coeff_grass = 1.036 / (1 + 103.989 * Exp(-0.0996 * (curing - 20)))
+    curing_coeff_grass = 1.036 / (1 + 103.989 * exp(-0.0996 * (curing - 20)))
 End Function
 
 Public Function moist_coeff_grass(U_10, mc As Single) As Single
@@ -26,7 +26,7 @@ Public Function moist_coeff_grass(U_10, mc As Single) As Single
     '''   mc: fuel moisture content (%)
     
     If mc < 12 Then
-        moist_coeff_grass = Exp(-0.108 * mc)
+        moist_coeff_grass = exp(-0.108 * mc)
     Else
         If U_10 <= 10 Then
             moist_coeff_grass = 0.684 - 0.0342 * mc
@@ -108,7 +108,7 @@ Public Function Intensity_grass(ByVal ROS As Double, ByVal fuel_load As Single) 
     'limit fuel load to range 1 - 6
     fuel_load = WorksheetFunction.Max(1, fuel_load)
     fuel_load = WorksheetFunction.Min(6, fuel_load)
-    Intensity_grass = intensity(ROS, fuel_load)
+    Intensity_grass = Intensity(ROS, fuel_load)
 End Function
 
 Public Function state_to_load_grass(state As String) As Single

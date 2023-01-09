@@ -5,7 +5,7 @@ Fire Behaviour Analysis Excel VBA Scripts
 Implements the Australian Fire Danger Rating System models in Excel.  
 All models tested against the python scripts that underlie AFDRS.
 
-User versions have a date stamp subscript (eg. PyroXL_AFDRS_20220921) and are locked to prevent corruption by the user. Light coloured cells are for user input.
+As of version 20230109 the user version is a macro-enabled template which allows the user to open a copy of workbook and change formulae and structure without the risk of corrupting the original. User versions have a date stamp subscript (eg. PyroXL_AFDRS_20220921).
 
 Test and development versions have no subscript, are unlocked. Note the development versions have automatic calculation turned of so worksheets must be calculated manually.
 
@@ -14,6 +14,7 @@ A rudimentary guide to the VBA user defined functions can be found in the docs/g
 If you use this code in other projects please acknowledge the author and NSW Rural Fire Service.
 
 ## Change log
+- 20230109: User version now a macro-enabled template. Buttongrass model added. FFDI and Vesta2 VBA functions are included for use if desired. Time since fire, time since rain and precipitation are now gathered under the weather data. Errors arising from relative references fixed in the Pine model.
  - 22021201: all AFDRS models except buttongrass now implemented. Vesta2 modules written but spread interface not implemented however they are available as formulae.
  - 20220930: added woodlands model. models now implemented include forest, grassland, woodland, heath, pine and mallee
  - 

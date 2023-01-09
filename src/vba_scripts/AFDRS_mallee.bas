@@ -42,7 +42,7 @@ Public Function FMC_mallee( _
         FMC_mallee = 4.79 + 0.173 * relative_humidity - 0.1 * (air_temperature - 25)
     End If
         
-    FMC_mallee = FMC_mallee + 67.128 * (1 - Exp(-3.132 * precipitation)) * Exp(-0.0858 * time_since_rain)
+    FMC_mallee = FMC_mallee + 67.128 * (1 - exp(-3.132 * precipitation)) * exp(-0.0858 * time_since_rain)
 End Function
 
 Public Function spread_prob_mallee(wind_speed, fuel_moisture, overstorey_cover) As Double
@@ -55,7 +55,7 @@ Public Function spread_prob_mallee(wind_speed, fuel_moisture, overstorey_cover) 
     '''   fuel_moisture: dead fuel moisture content (%)
     '''   overstorey_cover: (%)
    
-    spread_prob_mallee = (1 / (1 + Exp(-(14.624 + 0.2066 * wind_speed - 1.8719 * fuel_moisture - 0.030442 * overstorey_cover))))
+    spread_prob_mallee = (1 / (1 + exp(-(14.624 + 0.2066 * wind_speed - 1.8719 * fuel_moisture - 0.030442 * overstorey_cover))))
 End Function
 
 Public Function crown_prob_mallee(wind_speed, fuel_moisture) As Double
@@ -68,7 +68,7 @@ Public Function crown_prob_mallee(wind_speed, fuel_moisture) As Double
     '''   wind_speed: 10 m wind speed(km/h)
     '''   fuel_moisture: dead fuel moisture content (%)
     
-    crown_prob_mallee = 1 / (1 + Exp(-(-11.138 + 1.4054 * wind_speed - 3.4217 * fuel_moisture)))
+    crown_prob_mallee = 1 / (1 + exp(-(-11.138 + 1.4054 * wind_speed - 3.4217 * fuel_moisture)))
 End Function
 
 
@@ -86,8 +86,8 @@ Public Function ROS_mallee(wind_speed, fuel_moisture, overstorey_cover, overstor
     spread_probability = spread_prob_mallee(wind_speed, fuel_moisture, overstorey_cover)
     crown_probability = crown_prob_mallee(wind_speed, fuel_moisture)
     
-    ros_surface = 3.337 * wind_speed * Exp(-0.1284 * fuel_moisture) * Power(overstorey_height, -0.7073) * 60
-    ros_crown = 9.5751 * wind_speed * Exp(-0.1795 * fuel_moisture) * Power((overstorey_cover / 100), 0.3589) * 60
+    ros_surface = 3.337 * wind_speed * exp(-0.1284 * fuel_moisture) * Power(overstorey_height, -0.7073) * 60
+    ros_crown = 9.5751 * wind_speed * exp(-0.1795 * fuel_moisture) * Power((overstorey_cover / 100), 0.3589) * 60
     
     If spread_probability < 0.5 Then
         ROS_mallee = 0
@@ -137,11 +137,11 @@ Public Function fuel_load_mallee( _
     End Select
 End Function
 
-Public Function flame_height_mallee(intensity) As Double
-    flame_height_mallee = Exp(-4.142) * Power(intensity, 0.633)
+Public Function flame_height_mallee(Intensity) As Double
+    flame_height_mallee = exp(-4.142) * Power(Intensity, 0.633)
 End Function
 
-Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, intensity) As Integer
+Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, Intensity) As Integer
     ''' returns the AFDRS FBI for mallee
     '''
     ''' args
@@ -178,8 +178,8 @@ Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, intensit
                     fbi_ua = fbi_b(2)
                     fbi_la = fbi_b(1)
                 Case Is >= 0.66
-                    param = intensity
-                    Select Case intensity
+                    param = Intensity
+                    Select Case Intensity
                         Case Is < 20000 'category 4
                             param_ua = 20000
                             param_la = 0

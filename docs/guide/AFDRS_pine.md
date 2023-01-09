@@ -6,7 +6,7 @@
        temp: air temperature (C)
        rh: relative humidity (%)
 
-### Public Function FA_pine(DF, DI, WAF As Single) As Single
+### Public Function FA_pine(DF, DI, waf As Single) As Single
      returns fuel availability estimates using drought factor
      From Cruz et al. (2022) Vesta Mk 2 model
      args

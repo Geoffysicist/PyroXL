@@ -27,27 +27,20 @@ Public Sub set_defaults()
     Range("fl_woodland").Value = 4.5 'woodland grass fuel load
     Range("curing_woodland").Value = 80 'grass curing
     Range("waf_woodland").Value = 0.5 'woodland wind adjustment factor
-    Range("rain_heath").Value = 0 'heath precipation last 48 hours
-    Range("tsr_heath").Value = 48 'heath time since rain
     Range("overstorey_heath").Value = False 'heath presence of overstorey
     Range("h_el_heath").Value = 2 'elevated fuel height
-    Range("tsf_heath").Value = 25 'heath  time since fire
+    'Range("tsf_heath").Value = 25 'heath  time since fire
     Range("fl_s_mallee").Value = 3 'mallee fl_s
     Range("fl_o_mallee").Value = 1 'mallee fl_o
     Range("cov_o_mallee").Value = 18 'mallee Cov_o
     Range("h_o_mallee").Value = 4.5 'mallee H_o
-    Range("tsf_mallee").Value = 20 'mallee time since fire
-    Range("rain_mallee").Value = 0 'mallee precipation last 48 hours
-    Range("tsr_mallee").Value = 48 'mallee time since rain
     Range("AWAP_uf").Value = 0 'soil moisture factor
-    Range("tsf_spinifex").Value = 25 'spinifex time since fire
-    Range("rain_spinifex").Value = 0 'spinifex precipation last 48 hours
-    Range("tsr_spinifex").Value = 48 'spinifex time since rain
     Range("productivity_spinifex").Value = 1 'arid = 1, low rainfall = 2, high rainfall = 3
     Range("subtype_spinifex").Value = "open" 'spinifex subtype
+    Range("productivity_buttongrass").Value = 1 'low = 1, high rainfall = 2
 End Sub
 
-Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
+Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest") As Single
     '''  returns FBI.
     '''
     ''' args
@@ -91,7 +84,7 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
     End Select
     
     'determine FBI
-    Select Case intensity
+    Select Case Intensity
         Case Is < intensity_b(0)
             FBI = -9999
             Exit Function
@@ -102,7 +95,7 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
             fbi_la = fbi_b(UBound(fbi_b))
         Case Else
             For i = 1 To UBound(intensity_b)
-                If intensity < intensity_b(i) Then
+                If Intensity < intensity_b(i) Then
                     fbi_la = fbi_b(i - 1)
                     fbi_ua = fbi_b(i)
                     intensity_la = intensity_b(i - 1)
@@ -112,12 +105,12 @@ Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest
             Next i
     End Select
     
-    FBI = fbi_la + (fbi_ua - fbi_la) * (intensity - intensity_la) / (intensity_ua - intensity_la)
+    FBI = fbi_la + (fbi_ua - fbi_la) * (Intensity - intensity_la) / (intensity_ua - intensity_la)
     FBI = Int(FBI) 'FBI needs to be truncated for National consistency
 
 End Function
 
-Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
+Public Function Intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
     ''' returns the fireline intensity (kW/m) based on Byram 1959
     '''
     ''' args
@@ -128,7 +121,7 @@ Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Dou
     ROS = ROS / 3600 'm/s
     fuel_load = fuel_load / 10 'kg/m^2
     
-    intensity = 18600 * ROS * fuel_load
+    Intensity = 18600 * ROS * fuel_load
 End Function
 
 Public Function fuel_amount(fuel_param_max, tsf, k) As Double
@@ -139,7 +132,7 @@ Public Function fuel_amount(fuel_param_max, tsf, k) As Double
     '''   tsf: time since fire (y)
     '''   k: fuel accumulation curve parameter
     
-    fuel_amount = fuel_param_max * (1 - Exp(-1 * tsf * k))
+    fuel_amount = fuel_param_max * (1 - exp(-1 * tsf * k))
 End Function
 
 Public Function fl_to_fhs(layer As String, fuel_load As Single)
@@ -170,4 +163,38 @@ Public Function fl_to_fhs(layer As String, fuel_load As Single)
             fl_to_fhs = fhs_dict(layer)(i)
         End If
     Next i
+End Function
+
+Public Function dewpoint(temp, rh) As Single
+    ''' returns the dew point temperature based on the Magnus formula with the the Arden Buck modification
+    '''
+    ''' args
+    '''   temp: air temperature (C)
+    '''   rh: relative humidity (%)
+
+    a = 6.1121 'hPa
+    b = 18.678
+    c = 257.14 '°C
+    d = 234.5 '°C
+
+    Gamma = Log((rh / 100) * exp((b - temp / d) * (temp / (c + temp))))
+    dewpoint = c * Gamma / (b - Gamma)
+    'dewpoint = 42
+End Function
+
+Public Function point(temp, rh) As Single
+    ''' returns the dew point temperature based on the Magnus formula with the the Arden Buck modification
+    '''
+    ''' args
+    '''   temp: air temperature (C)
+    '''   rh: relative humidity (%)
+
+    a = 6.1121 'hPa
+    b = 18.678
+    c = 257.14 '°C
+    d = 234.5 '°C
+
+    Gamma = Log((rh / 100) * exp((b - temp / d) * (temp / (c + temp))))
+    point = c * Gamma / (b - Gamma)
+    'dewpoint = 42
 End Function

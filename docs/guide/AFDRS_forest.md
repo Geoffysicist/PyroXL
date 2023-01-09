@@ -19,7 +19,7 @@
        ROS - forward rate of spread (m/h)
        h_el - elevated fuel height (m)
 
-### Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, WAF, Optional DI = 100, Optional submodel = "dry") As Double
+### Public Function ROS_forest(U_10, fhs_s, fhs_ns, h_ns, fmc, DF, waf, Optional DI = 100, Optional submodel = "dry") As Double
      returns the forward ROS (m/h) ignoring slope
      args
        U_10: 10 m wind speed (km/h)
@@ -52,7 +52,7 @@
        U_10: 10m wind speed (km/h)
        fhs_s: fuel hazard score surface
 
-### Public Function fuel_availability_forest(DF, Optional DI = 100, Optional WAF = 3, Optional submodel = "dry") As Double
+### Public Function fuel_availability_forest(DF, Optional DI = 100, Optional waf = 3, Optional submodel = "dry") As Double
      returns the fuel availability - proportion of fuel available to be burnt
      args
        DF: Drought factor
