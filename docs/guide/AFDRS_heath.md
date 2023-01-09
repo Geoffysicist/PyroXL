@@ -37,7 +37,7 @@
        tsf: time since fire (y)
        k: fuel accumulation curve constant
 
-### Public Function Flame_height_heath(intensity As Double) As Double
+### Public Function Flame_height_heath(Intensity As Double) As Double
      returns flame height (m)
      No equation for flame height was given in the Anderson et al. paper (2015).
      Here we use the flame height calculation for mallee-heath shrublands (Cruz, M. G., et al. (2013).

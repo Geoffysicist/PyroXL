@@ -24,7 +24,7 @@ fuel_params_dict = {
     # 'H_o': 20,
     # 'WRF_For': 3,
     # 'WF_Heath': 0.667,
-    'WF_Sav': 0.5,
+    # 'WF_Sav': 0.5,
     # 'FTno_State': 0, # 7000 if Tasmania
     # 'FTno_FDR': 450,
     'Prod_BG': 1,
@@ -54,8 +54,9 @@ num_param_dict = {
 }
 
 class_param_dict = {
-        'grass_condition': (1,2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
-        # 'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
+    # 'Prod_BG': (1,2),
+    # 'grass_condition': (1,2,3), # 1 = eaten-out, 2 = grazed, 3 = natural
+    # 'GrassFuelLoad_SFC': (1.5, 4.5, 6) # note this will create inconsistent cartesian product with grass_condition but OK for testing
 }
 
 df = tdg.generate_test_data(datetime_param_dict,num_param_dict,class_param_dict)
@@ -69,5 +70,5 @@ for param, series in output_dict.items():
 
 print(df.head())
 print(df.shape)
-df.to_csv('tests/buttongrass_small.csv', index=False)
+df.to_csv('tests/buttongrass.csv', index=False)
 # df.to_pickle('tests/buttongrass_small.pkl')

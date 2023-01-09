@@ -16,7 +16,7 @@ Public Function FMC_pine(temp, rh As Single) As Single
     FMC_pine = 4.3426 + 0.1188 * rh - 0.0211 * temp
 End Function
 
-Public Function FA_pine(DF, DI, WAF As Single) As Single
+Public Function FA_pine(DF, DI, waf As Single) As Single
     ''' returns fuel availability estimates using drought factor
     ''' From Cruz et al. (2022) Vesta Mk 2 model
     '''
@@ -25,12 +25,12 @@ Public Function FA_pine(DF, DI, WAF As Single) As Single
     '''   DI: Drought IndexKeetch Byram drought index KBDI
     '''   WAF: wind adjustment factor restricted to range 3 to 5
     
-    C1 = 0.1 * ((0.0046 * Power(WAF, 2) - 0.0079 * WAF - 0.0175) * DI + (-0.9167 * Power(WAF, 2) + 1.5833 * WAF + 13.5))
+    C1 = 0.1 * ((0.0046 * Power(waf, 2) - 0.0079 * waf - 0.0175) * DI + (-0.9167 * Power(waf, 2) + 1.5833 * waf + 13.5))
     C1 = WorksheetFunction.Max(C1, 0)
     C1 = WorksheetFunction.Min(C1, 1)
 
     
-    FA_pine = 1.008 / (1 + 104.9 * Exp(-0.9306 * C1 * DF))
+    FA_pine = 1.008 / (1 + 104.9 * exp(-0.9306 * C1 * DF))
 End Function
 
 Public Function U_flame_height(U_10, h_o As Single) As Single
@@ -42,7 +42,7 @@ Public Function U_flame_height(U_10, h_o As Single) As Single
     
     Dim U_stand_height As Single 'wind speed at stand height
     U_stand_height = U_10 * Log((0.36 * h_o) / (0.13 * h_o)) / Log((10 + 0.36 * h_o) / (0.13 * h_o))
-    U_flame_height = U_stand_height * Exp(-0.48)
+    U_flame_height = U_stand_height * exp(-0.48)
 End Function
 
 Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
@@ -100,24 +100,24 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     bulk_density = fuel_load_IMP / fuel_depth
     packing_ratio = bulk_density / particle_density
     heat_of_preignition = 250 + 1116 * moisture_fraction 'Btu/lb
-    effective_heating_number = Exp(-138 / surface_volume_ratio)
+    effective_heating_number = exp(-138 / surface_volume_ratio)
 
     net_fuel_load_IMP = fuel_load_IMP / (1 + mineral_content_total)
     
-    E = 0.715 * Exp(-0.000359 * surface_volume_ratio)
-    B = 0.02562 * Power(surface_volume_ratio, 0.54)
-    C = 7.47 * Exp(-0.133 * Power(surface_volume_ratio, 0.55))
+    E = 0.715 * exp(-0.000359 * surface_volume_ratio)
+    b = 0.02562 * Power(surface_volume_ratio, 0.54)
+    c = 7.47 * exp(-0.133 * Power(surface_volume_ratio, 0.55))
     packing_ratio_op = 3.348 * Power(surface_volume_ratio, -0.8189) 'Optimum packing ratio
-    wind_coefficient = C * Power(wind_mid_flame * 54.68, B) * Power(packing_ratio / packing_ratio_op, -E)
+    wind_coefficient = c * Power(wind_mid_flame * 54.68, b) * Power(packing_ratio / packing_ratio_op, -E)
 
-    xi = Power(192 + 0.2595 * surface_volume_ratio, -1) * Exp((0.792 * 0.681 * Power(surface_volume_ratio, 0.5)) * (packing_ratio + 0.1)) 'Propagating flux ratio
+    xi = Power(192 + 0.2595 * surface_volume_ratio, -1) * exp((0.792 * 0.681 * Power(surface_volume_ratio, 0.5)) * (packing_ratio + 0.1)) 'Propagating flux ratio
 
     eta_S = 0.174 * Power(mineral_content_silica_free, -0.19) 'Mineral damping coefficient
     eta_M = 1 - 2.59 * moisture_fraction / moisture_fraction_extinction + 5.11 * Power(moisture_fraction / moisture_fraction_extinction, 2) - 3.52 * Power(moisture_fraction / moisture_fraction_extinction, 3) 'Moisture damping coefficient
 
     a = 1 / (4.77 * Power(surface_volume_ratio, 0.1) - 7.27)
     gamma_max = Power(surface_volume_ratio, 1.5) / (495 + 0.0594 * Power(surface_volume_ratio, 1.5)) 'Maximum reaction velocity
-    Gamma = gamma_max * Power((packing_ratio / packing_ratio_op), a) * Exp(a * (1 - packing_ratio / packing_ratio_op)) 'Optimum reaction velocity
+    Gamma = gamma_max * Power((packing_ratio / packing_ratio_op), a) * exp(a * (1 - packing_ratio / packing_ratio_op)) 'Optimum reaction velocity
 
     reaction_intensity = Gamma * net_fuel_load_IMP * heat_of_combustion_IMP * eta_M * eta_S 'Btu/ft^2 min
 
@@ -133,12 +133,12 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     heat_of_ignition = 460 + 26 * foliar_moisture_content 'Heat of ignition, kJ/kg
     crowning_intensity = Power(0.01 * bh_o * heat_of_ignition, 1.5) 'Crowning threshold intensity, kW/m
     crowning_ratio = intensity_ / crowning_intensity 'If this is greater than 1 then crowning is predicted and vice versa
-    speed_active_MMIN = 11.021 * Power(U_10, 0.8966) * Power(bd_o, 0.1901) * Exp(-0.1714 * moisture_fraction * 100) 'Active crown fire spread rate, m/min.
+    speed_active_MMIN = 11.021 * Power(U_10, 0.8966) * Power(bd_o, 0.1901) * exp(-0.1714 * moisture_fraction * 100) 'Active crown fire spread rate, m/min.
     speed_active_MS = speed_active_MMIN / 60 'Converting to m/s
 
     'Calculate criteria for active crowning from Cruz (2008)
     CAC = speed_active_MMIN / (critical_mass_flow_rate / bd_o) 'Criteria for active crowning.
-    speed_passive = speed_active_MS * Exp(-1 * CAC) 'Passive ROS
+    speed_passive = speed_active_MS * exp(-1 * CAC) 'Passive ROS
     'passive = ((crowning_ratio > 1) & (CAC < 1))
     Dim passive, acitve, surface As Boolean
     passive = crowning_ratio > 1 And CAC < 1
@@ -161,7 +161,7 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     'convert to m/h
     ROS = ROS * 3600
     Dim Intensity_total As Double
-    Intensity_total = intensity(ROS, fuel_load)
+    Intensity_total = Intensity(ROS, fuel_load)
     flame_height = 0.07755 * Power(Intensity_total, 0.46)
     
     If Active Then
@@ -212,7 +212,7 @@ Public Function fb_pine_ensemble(U_10, mc, DF, KBDI) As Variant()
     Dim wrf, ROS, Intensity_total, flame_height As Single
     wrf = 5
     ROS = ROS_grass(U_10, (mc), 100, "eaten-out")
-    Intensity_total = intensity(ROS, 1.5) * grass_proportion
+    Intensity_total = Intensity(ROS, 1.5) * grass_proportion
     flame_height = Flame_height_grass((ROS), "eaten-out") * grass_proportion
     ROS = ROS * grass_proportion
     

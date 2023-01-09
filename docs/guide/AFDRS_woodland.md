@@ -1,6 +1,6 @@
 ## AFDRS_woodland
 
-### Public Function ROS_woodland(U_10, mc As Single, curing As Single, subtype As String, Optional fuel_load As Single = 4.5, Optional WAF As Single = 0.5) As Single
+### Public Function ROS_woodland(U_10, mc As Single, curing As Single, subtype As String, Optional fuel_load As Single = 4.5, Optional waf As Single = 0.5) As Single
      returns the forward ROS (m/h) ignoring slope
      Based on:
      Cheney, N. P., Gould, J. S., & Catchpole, W. R. (1998). Prediction of fire

@@ -22,7 +22,7 @@ Public Function FMC_heath(temp, rh, rain, hours As Double) As Double
     If rh <= 60 Then
         mc_1 = mc_1 - 0.027 * rh
     End If
-    mc_2 = 67.128 * (1 - Exp(-3.132 * rain)) * Exp(-0.0858 * hours)
+    mc_2 = 67.128 * (1 - exp(-3.132 * rain)) * exp(-0.0858 * hours)
 
     FMC_heath = mc_1 + mc_2
 End Function
@@ -35,11 +35,11 @@ Public Function Mf_heath(mc As Double) As Double
     
     Select Case mc
         Case Is < 4
-            Mf_heath = Exp(-0.0762 * 4)
+            Mf_heath = exp(-0.0762 * 4)
         Case Is > 20
             Mf_heath = 0.05
         Case Else
-            Mf_heath = Exp(-0.0762 * mc)
+            Mf_heath = exp(-0.0762 * mc)
     End Select
 End Function
 
@@ -54,8 +54,8 @@ Public Function ROS_heath(U_10, h_el, mc As Double, overstorey As Boolean) As Do
     '''   mc: fuel moisture content (%)
     '''   overstorey: presence or absence of woodland overstorey (true/false)
     
-    Dim Mf As Double 'fuel moisture factor
-    Mf = Mf_heath(mc)
+    Dim mf As Double 'fuel moisture factor
+    mf = Mf_heath(mc)
     
     'wrf depends on presence or absence of woodland overstorey
     Dim wrf As Double: wrf = 0.667
@@ -65,11 +65,11 @@ Public Function ROS_heath(U_10, h_el, mc As Double, overstorey As Boolean) As Do
     End If
     
     
-    ROS_heath = 5.6715 * (wrf * U_10) ^ 0.912 * h_el ^ 0.227 * Mf * 60
+    ROS_heath = 5.6715 * (wrf * U_10) ^ 0.912 * h_el ^ 0.227 * mf * 60
     
     'apply go-nogo correction
-    ROS_heath = ROS_heath / (1 + Exp(-0.4 * (wrf * U_10 - 20)))
-    ROS_heath = ROS_heath / (1 + Exp(-0.4 * (12 - mc)))
+    ROS_heath = ROS_heath / (1 + exp(-0.4 * (wrf * U_10 - 20)))
+    ROS_heath = ROS_heath / (1 + exp(-0.4 * (12 - mc)))
     
 End Function
 Public Function intensity_heath(ROS, fl_max, tsf, k) As Double
@@ -82,13 +82,13 @@ Public Function intensity_heath(ROS, fl_max, tsf, k) As Double
     '''   k: fuel accumulation curve constant
     
     Dim fuel_load_ As Double
-    fuel_load_ = fl_max * (1 - Exp(-1 * tsf * k)) 'fuel_load(fl_max, tsf, k)
+    fuel_load_ = fl_max * (1 - exp(-1 * tsf * k)) 'fuel_load(fl_max, tsf, k)
     
     'intensity_heath = intensity(ROS, fuel_load_)
     intensity_heath = 18600 * (fuel_load_ / 10) * (ROS / 3600)
 End Function
 
-Public Function Flame_height_heath(intensity As Double) As Double
+Public Function Flame_height_heath(Intensity As Double) As Double
     ''' returns flame height (m)
     ''' No equation for flame height was given in the Anderson et al. paper (2015).
     ''' Here we use the flame height calculation for mallee-heath shrublands (Cruz, M. G., et al. (2013).
@@ -98,5 +98,5 @@ Public Function Flame_height_heath(intensity As Double) As Double
     ''' args
     '''   intensity: fire line intensity (kW/m)
     
-    Flame_height_heath = Exp(-4.142) * intensity ^ 0.633
+    Flame_height_heath = exp(-4.142) * Intensity ^ 0.633
 End Function

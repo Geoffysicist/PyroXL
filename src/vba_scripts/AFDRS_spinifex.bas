@@ -196,7 +196,7 @@ Public Function intensity_spinifex(rate_of_spread, time_since_fire, productivity
     '''   subtype: "open" or "woodland"
     
     fuel_load = fuel_load_spinifex(time_since_fire, productivity, subtype) '/ KGSQM_TO_TPH this conversion happens in intensity calc
-    intensity_spinifex = intensity(rate_of_spread, fuel_load)
+    intensity_spinifex = Intensity(rate_of_spread, fuel_load)
 End Function
 
 Public Function flame_height_spinifex(rate_of_spread, time_since_fire, productivity, subtype) As Single

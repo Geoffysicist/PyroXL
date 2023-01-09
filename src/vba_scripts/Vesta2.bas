@@ -65,7 +65,7 @@ Public Function fuel_availability_Vesta2(DF, Optional DI = 100, Optional waf = 3
         DF = WorksheetFunction.Min(DF, 10)
         DF = WorksheetFunction.Max(DF, 0)
     End If
-    fuel_availability_Vesta2 = 1.008 / (1 + 104.9 * Exp(-0.9306 * DF))
+    fuel_availability_Vesta2 = 1.008 / (1 + 104.9 * exp(-0.9306 * DF))
 End Function
 
 Public Function fme_Vesta2(mf, fa) As Single
@@ -94,7 +94,7 @@ Public Function prob_phase2(U_10, waf, fme, fls) As Single
             prob_phase2 = 0
         Case Else
             g_x = -23.9315 + 1.7033 * U_10 / waf + 12.0822 * fme + 0.95236 * fls
-            prob_phase2 = 1 / (1 + Exp(-g_x))
+            prob_phase2 = 1 / (1 + exp(-g_x))
     End Select
 End Function
 
@@ -113,7 +113,7 @@ Public Function prob_phase3(U_10, ros2, fme) As Single
             prob_phase3 = 0
         Case Else
             g_x = -32.3074 + 0.2951 * U_10 + 26.8734 * fme
-            prob_phase3 = 1 / (1 + Exp(-g_x))
+            prob_phase3 = 1 / (1 + exp(-g_x))
     End Select
 End Function
 

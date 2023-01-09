@@ -2,13 +2,13 @@
 
 ### Public Sub set_defaults()
 
-### Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
+### Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest") As Single
       returns FBI.
      args
        intensity: file line intensity (kW/m)
        fuel: the fuel type
 
-### Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
+### Public Function Intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
      returns the fireline intensity (kW/m) based on Byram 1959
      args
        ROS: forward rate of spread (km/h)
@@ -26,3 +26,15 @@
      args
        layer: fuel layer (surface, near surface, elevated, bark)
        fuel_load: (t/ha)
+
+### Public Function dewpoint(temp, rh) As Single
+     returns the dew point temperature based on the Magnus formula with the the Arden Buck modification
+     args
+       temp: air temperature (C)
+       rh: relative humidity (%)
+
+### Public Function point(temp, rh) As Single
+     returns the dew point temperature based on the Magnus formula with the the Arden Buck modification
+     args
+       temp: air temperature (C)
+       rh: relative humidity (%)

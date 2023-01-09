@@ -60,9 +60,9 @@
        k_surface: surface fuel accumulation constant
        k_canopy: canopy fuel accumulation constant
 
-### Public Function flame_height_mallee(intensity) As Double
+### Public Function flame_height_mallee(Intensity) As Double
 
-### Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, intensity) As Integer
+### Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, Intensity) As Integer
      returns the AFDRS FBI for mallee
      args
        wind_speed: 10 m wind speed(km/h)
