@@ -1,1 +1,0 @@
-# Stripped down spread calculations.
