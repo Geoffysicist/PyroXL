@@ -156,9 +156,9 @@ Public Function Spotting_forest(ROS, U_10, fhs_s As Single) As Integer
     If ROS < 150 Then
         Spotting_forest = 50
     Else
-        Spotting_forest = Abs( _
-            176.969 * Atn(fhs_s) * (ROS / (U_10 ^ 0.25)) ^ 0.5 + _
-            1568800 * fhs_s ^ -1 * (ROS / (U_10 ^ 0.25)) ^ -1.5 - 3015.09 _
+        Spotting_forest = Abs( _ &
+            176.969 * Atn(fhs_s) * (ROS / (U_10 ^ 0.25)) ^ 0.5 + _ &
+            1568800 * fhs_s ^ -1 * (ROS / (U_10 ^ 0.25)) ^ -1.5 - 3015.09 _ &
         )
     End If
 End Function
@@ -183,4 +183,21 @@ Public Function fuel_availability_forest(DF, Optional DI = 100, Optional waf = 3
     End If
 End Function
 
-
+Public Function forest_spotting(rate_of_spread, wind_speed, FHS_s) As Double
+    ''' returns the spotting distance in m
+    '''
+    ''' args
+    '''   rate_of_spread - rate of spread (m/h)
+    '''   wind_speed - 10m open wind speed (km/h)
+    '''   FHS_s - steady-state surface fuel hazard score (0-4)
+    
+    If rate_of_spread < 150 Then
+        forest_spotting = 50
+    Else
+        forest_spotting = abs(
+            176.969 * atan(FHS_s) * power(rate_of_spread/power(wind_speed, 0.25), 0.5) 
+            + 1568800 * power(FHS_s,-1) * power(rate_of_spread / power(wind_speed, 0.25), -1.5) 
+            - 3015.09
+            )
+    End If
+End Function

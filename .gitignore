@@ -1,3 +1,5 @@
 src/spread_models/
 src/fdrs_calcs-master/
 test_*
+.*
+!/.gitignore
