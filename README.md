@@ -14,6 +14,9 @@ A rudimentary guide to the VBA user defined functions can be found in the docs/g
 If you use this code in other projects please acknowledge the author and NSW Rural Fire Service.
 
 ## Change log
+- 20240311: Added notes to several fields; exposed spread probabilities for mallee and spinifex, exposed some growth curve parameters
+- 20240228: Included probability of breach of firebreak using the formula from Wilson, A. A. G. (2011). Width of firebreak that is necessary to stop grass fires: Some field experiments. Canadian Journal of Forest Research. https://doi.org/10.1139/x88-104
+- 20240215: Updated heath and spinifex models in line with AFDRS changes (see AFDRS technical guides); updated mallee moisture function in line with Criuz 2015
 - 20230109: User version now a macro-enabled template. Buttongrass model added. FFDI and Vesta2 VBA functions are included for use if desired. Time since fire, time since rain and precipitation are now gathered under the weather data. Errors arising from relative references fixed in the Pine model.
  - 22021201: all AFDRS models except buttongrass now implemented. Vesta2 modules written but spread interface not implemented however they are available as formulae.
  - 20220930: added woodlands model. models now implemented include forest, grassland, woodland, heath, pine and mallee
