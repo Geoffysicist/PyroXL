@@ -5,9 +5,9 @@ Fire Behaviour Analysis Excel VBA Scripts
 Implements the Australian Fire Danger Rating System models in Excel.  
 All models tested against the python scripts that underlie AFDRS.
 
-As of version 20230109 the user version is a macro-enabled template which allows the user to open a copy of workbook and change formulae and structure without the risk of corrupting the original. User versions have a date stamp subscript (eg. PyroXL_AFDRS_20220921).
+As of version 20230109 the user version is a macro-enabled template xltm which allows the user to open a copy of workbook and change formulae and structure without the risk of corrupting the original.
 
-Test and development versions have no subscript, are unlocked. Note the development versions have automatic calculation turned of so worksheets must be calculated manually.
+Test, development and research versions are xlsm, are unlocked. Note some test and development versions have automatic calculation turned of so worksheets must be calculated manually.
 
 A rudimentary guide to the VBA user defined functions can be found in the docs/guide directory. The user guides are markdown files so are probably best read using a browser through the github repository: https://github.com/Geoffysicist/PyroXL/tree/main/docs/guide
 
