@@ -2,12 +2,10 @@
 Fire Behaviour Analysis Excel VBA Scripts
 
 ## PyroXL_AFDRS spreadsheet
-Implements the Australian Fire Danger Rating System models in Excel.  
-All models tested against the python scripts that underlie AFDRS.
+The original intent of this spreadsheet was to implement the Australian Fire Danger Rating System models in Excel.  
+All AFDRS models are tested against the python scripts that underlie AFDRS.
 
-As of version 20230109 the user version is a macro-enabled template xltm which allows the user to open a copy of workbook and change formulae and structure without the risk of corrupting the original.
-
-Test, development and research versions are xlsm, are unlocked. Note some test and development versions have automatic calculation turned of so worksheets must be calculated manually.
+Requests for additional functionality have resulted in the addition of non-AFDRS models
 
 A rudimentary guide to the VBA user defined functions can be found in the docs/guide directory. The user guides are markdown files so are probably best read using a browser through the github repository: https://github.com/Geoffysicist/PyroXL/tree/main/docs/guide
 
@@ -23,6 +21,8 @@ If you use this code in other projects please acknowledge the author and NSW Rur
  - Further changes are now embedded in the spreadsheets on the notes page
 
 ## DISCLAIMER
+This calculator is offered as is without guarantees. While every effort has been made to ensure the calculations are correct, this is not an official product and users should recognise it may ocntain errors.
+
 This calculator should be used with caution. The accuracy of calculations will be impacted by the accuracy of the input data.  Potential sources of error in these calculations could include (but are not limited to): incorrect or invalid weather observations, incorrect or invalid fuel observations, missing or unknown antecedent conditions (e.g. previous rainfall or time since fire).
 
 Calculating the AFDRS Fire Behaviour Index can require highly detailed information about fuel condition, arrangement and load. Users should be aware that small differences in this information can produce significantly different calculations of FBI and care should be taken to ensure that the values used are not only accurate but area also representative of the broader landscape.
