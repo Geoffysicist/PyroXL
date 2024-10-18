@@ -20,7 +20,7 @@ If you use this code in other projects please acknowledge the author and NSW Rur
 - 20230109: User version now a macro-enabled template. Buttongrass model added. FFDI and Vesta2 VBA functions are included for use if desired. Time since fire, time since rain and precipitation are now gathered under the weather data. Errors arising from relative references fixed in the Pine model.
  - 22021201: all AFDRS models except buttongrass now implemented. Vesta2 modules written but spread interface not implemented however they are available as formulae.
  - 20220930: added woodlands model. models now implemented include forest, grassland, woodland, heath, pine and mallee
- - 
+ - Further changes are now embedded in the spreadsheets on the notes page
 
 ## DISCLAIMER
 This calculator should be used with caution. The accuracy of calculations will be impacted by the accuracy of the input data.  Potential sources of error in these calculations could include (but are not limited to): incorrect or invalid weather observations, incorrect or invalid fuel observations, missing or unknown antecedent conditions (e.g. previous rainfall or time since fire).
