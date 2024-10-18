@@ -43,7 +43,7 @@ Public Function Intensity_forest( _
     End If
 
         
-    Intensity_forest = Intensity(ROS, fuel_load)
+    Intensity_forest = intensity(ROS, fuel_load)
 End Function
 
 Public Function Flame_height_forest(ROS As Double, h_el As Single) As Single
@@ -156,9 +156,9 @@ Public Function Spotting_forest(ROS, U_10, fhs_s As Single) As Integer
     If ROS < 150 Then
         Spotting_forest = 50
     Else
-        Spotting_forest = Abs( _ &
-            176.969 * Atn(fhs_s) * (ROS / (U_10 ^ 0.25)) ^ 0.5 + _ &
-            1568800 * fhs_s ^ -1 * (ROS / (U_10 ^ 0.25)) ^ -1.5 - 3015.09 _ &
+        Spotting_forest = Abs( _
+            176.969 * Atn(fhs_s) * (ROS / (U_10 ^ 0.25)) ^ 0.5 + _
+            1568800 * fhs_s ^ -1 * (ROS / (U_10 ^ 0.25)) ^ -1.5 - 3015.09 _
         )
     End If
 End Function
@@ -183,21 +183,86 @@ Public Function fuel_availability_forest(DF, Optional DI = 100, Optional waf = 3
     End If
 End Function
 
-Public Function forest_spotting(rate_of_spread, wind_speed, FHS_s) As Double
-    ''' returns the spotting distance in m
-    '''
-    ''' args
-    '''   rate_of_spread - rate of spread (m/h)
-    '''   wind_speed - 10m open wind speed (km/h)
-    '''   FHS_s - steady-state surface fuel hazard score (0-4)
+Public Sub update_from_LUT_Forest(Optional loads_only As Boolean = False)
+    Dim FTno As Single
+    Dim time_since_fire As Single
     
-    If rate_of_spread < 150 Then
-        forest_spotting = 50
-    Else
-        forest_spotting = abs(
-            176.969 * atan(FHS_s) * power(rate_of_spread/power(wind_speed, 0.25), 0.5) 
-            + 1568800 * power(FHS_s,-1) * power(rate_of_spread / power(wind_speed, 0.25), -1.5) 
-            - 3015.09
-            )
+    Dim fuel_load_max As Single
+    Dim fuel_load_k As Single
+    
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassForest").Value, Range("ForestLUT"), 2, False)
+    
+    If FTno = 9999 Then
+        Exit Sub
     End If
-End Function
+    
+    Dim lut As String
+    lut = "AFDRS Fuel LUT"
+    Dim table As String
+    table = "AFDRS_LUT"
+    Dim fuel_sub_type As String
+    fuel_sub_type = "Fuel_FDR"
+    
+    If Range("State").Value = "NSWv402" Then
+        lut = "NSW_Fuel_v402_LUT"
+        table = "NSW_fuel_LUT"
+        fuel_sub_type = "AFDRS fuel type"
+    End If
+    
+    time_since_fire = Range("tsf").Value
+    
+    ' surface fuel
+    fuel_load_max = LookupValueInTable(FTno, "FTno_State", "FL_s", lut, table)
+    fuel_load_k = LookupValueInTable(FTno, "FTno_State", "Fk_s", lut, table)
+    Range("fl_s_forest").Value = fuel_amount(fuel_load_max, time_since_fire, fuel_load_k)
+    fhs_max = LookupValueInTable(FTno, "FTno_State", "FHS_s", lut, table)
+    Range("fhs_s").Value = fuel_amount(fhs_max, time_since_fire, fuel_load_k)
+    
+    
+    ' near surface fuel
+    fuel_load_max = LookupValueInTable(FTno, "FTno_State", "FL_ns", lut, table)
+    fuel_load_k = LookupValueInTable(FTno, "FTno_State", "Fk_ns", lut, table)
+    Range("fl_ns_forest").Value = fuel_amount(fuel_load_max, time_since_fire, fuel_load_k)
+    fhs_max = LookupValueInTable(FTno, "FTno_State", "FHS_ns", lut, table)
+    Range("fhs_ns").Value = fuel_amount(fhs_max, time_since_fire, fuel_load_k)
+    
+    ' elevated fuel
+    fuel_load_max = LookupValueInTable(FTno, "FTno_State", "FL_el", lut, table)
+    fuel_load_k = LookupValueInTable(FTno, "FTno_State", "Fk_el", lut, table)
+    Range("fl_e_forest").Value = fuel_amount(fuel_load_max, time_since_fire, fuel_load_k)
+    
+    ' bark fuel load
+    fuel_load_max = LookupValueInTable(FTno, "FTno_State", "FL_b", lut, table)
+    fuel_load_k = LookupValueInTable(FTno, "FTno_State", "Fk_b", lut, table)
+    Range("fl_b_forest").Value = fuel_amount(fuel_load_max, time_since_fire, fuel_load_k)
+    
+    ' canopy fuel load
+    fuel_load_max = LookupValueInTable(FTno, "FTno_State", "FL_o", lut, table)
+    fuel_load_k = LookupValueInTable(FTno, "FTno_State", "Fk_o", lut, table)
+    Range("fl_o_forest").Value = fuel_amount(fuel_load_max, time_since_fire, fuel_load_k)
+    
+    If Not loads_only Then
+        
+        ' near surface fuel height
+        Range("h_ns_forest").Value = LookupValueInTable(FTno, "FTno_State", "H_ns", lut, table)
+        
+        ' near surface fuel height
+        Range("h_e_forest").Value = LookupValueInTable(FTno, "FTno_State", "H_el", lut, table)
+        
+        ' near surface fuel height
+        Range("h_o_forest").Value = LookupValueInTable(FTno, "FTno_State", "H_o", lut, table)
+        
+        'WRF
+        Range("waf_forest").Value = LookupValueInTable(FTno, "FTno_State", "WRF_For", lut, table)
+        
+        ' submodel
+        If LookupValueInTable(FTno, "FTno_State", fuel_sub_type, lut, table) = "Wet_forest" Then
+        
+            Range("submodel_forest").Value = "wet"
+        Else
+            Range("submodel_forest").Value = "dry"
+        End If
+        
+    End If
+   
+End Sub

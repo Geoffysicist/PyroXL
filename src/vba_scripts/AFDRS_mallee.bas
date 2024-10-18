@@ -22,6 +22,7 @@ Public Function FMC_mallee( _
     Dim start_peak_month, end_peak_month As Integer
     Dim start_afternoon, end_afternoon As Integer
     Dim sunrise, sunset As Integer
+    Dim delta As Integer
     
     start_peak_month = 10 'October
     end_peak_month = 3 'March
@@ -36,12 +37,12 @@ Public Function FMC_mallee( _
     
     If ((months >= start_peak_month) Or (months <= end_peak_month)) And _
         (hours >= start_afternoon) And (hours <= end_afternoon) Then
-        FMC_mallee = (4.79 + 0.173 * relative_humidity - 0.1 * _
-            (air_temperature - 25) - 0.027 * relative_humidity)
+        delta = 1
     Else
-        FMC_mallee = 4.79 + 0.173 * relative_humidity - 0.1 * (air_temperature - 25)
+        delta = 0
     End If
-        
+    FMC_mallee = 4.74 + 0.108 * relative_humidity - 0.1 * (air_temperature - 25) - delta * (1.68 + (0.028 * relative_humidity))
+    
     FMC_mallee = FMC_mallee + 67.128 * (1 - exp(-3.132 * precipitation)) * exp(-0.0858 * time_since_rain)
 End Function
 
@@ -72,7 +73,7 @@ Public Function crown_prob_mallee(wind_speed, fuel_moisture) As Double
 End Function
 
 
-Public Function ROS_mallee(wind_speed, fuel_moisture, overstorey_cover, overstorey_height) As Double
+Public Function ROS_mallee(wind_speed, fuel_moisture, overstorey_cover, overstorey_height, spread_probability, crown_probability) As Double
     ''' return rate of spread (m/h) [Range = 0 - 8000].
     ''' Based on: Cruz, M. G., et al. (2013). "Fire behaviour modelling in semi-arid
     ''' mallee-heath shrublands of southern Australia." Environmental Modelling & Software 40: 21-34.
@@ -82,9 +83,6 @@ Public Function ROS_mallee(wind_speed, fuel_moisture, overstorey_cover, overstor
     '''   fuel_moisture: dead fuel moisture content (%)
     '''   overstorey_cover: (%)
     '''   overstorey_height: (m)
-    
-    spread_probability = spread_prob_mallee(wind_speed, fuel_moisture, overstorey_cover)
-    crown_probability = crown_prob_mallee(wind_speed, fuel_moisture)
     
     ros_surface = 3.337 * wind_speed * exp(-0.1284 * fuel_moisture) * Power(overstorey_height, -0.7073) * 60
     ros_crown = 9.5751 * wind_speed * exp(-0.1795 * fuel_moisture) * Power((overstorey_cover / 100), 0.3589) * 60
@@ -100,9 +98,7 @@ Public Function ROS_mallee(wind_speed, fuel_moisture, overstorey_cover, overstor
     End If
 End Function
 
-Public Function fuel_load_mallee( _
-    wind_speed, time_since_fire, fuel_moisture, fuel_load_surface, fuel_load_canopy, Optional k_surface, Optional k_canopy _
-    ) As Double
+Public Function fuel_load_mallee(fuel_load_surface, fuel_load_canopy, crown_probability) As Double
     ''' return fuel load based on crown probability.
     ''' if fuel loads are know don't pass the k values as arguments
     ''' if k values passed then use exponetial decay model to adjust fuel for age (fuel build-up).
@@ -111,21 +107,10 @@ Public Function fuel_load_mallee( _
     ''' Include canopy fuel based on crown_probability (Cruz pers. comm.).
     '''
     ''' args
-    '''   wind_speed: 10 m wind speed(km/h)
-    '''   fuel_moisture: dead fuel moisture content (%)
-    '''   fuel_load_surface: maximum surface fuel load (t/ha)
-    '''   fuel_load_canopy: maximum canopy fuel load (t/ha)
-    '''   k_surface: surface fuel accumulation constant
-    '''   k_canopy: canopy fuel accumulation constant
-    
-    crown_probability = crown_prob_mallee(wind_speed, fuel_moisture)
-    If Not IsMissing(k_surface) Then
-        fuel_load_surface = fuel_amount(fuel_load_surface, time_since_fire, k_surface)
-    End If
-    
-    If Not IsMissing(k_canopy) Then
-        fuel_load_canopy = fuel_amount(fuel_load_canopy, time_since_fire, k_canopy)
-    End If
+    '''   fuel_load_surface: surface fuel load (t/ha)
+    '''   fuel_load_canopy: canopy fuel load (t/ha)
+    '''   crown_probability: crown probability %
+
     
     Select Case crown_probability
         Case Is <= 0.01
@@ -137,11 +122,11 @@ Public Function fuel_load_mallee( _
     End Select
 End Function
 
-Public Function flame_height_mallee(Intensity) As Double
-    flame_height_mallee = exp(-4.142) * Power(Intensity, 0.633)
+Public Function flame_height_mallee(intensity) As Double
+    flame_height_mallee = exp(-4.142) * Power(intensity, 0.633)
 End Function
 
-Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, Intensity) As Integer
+Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, intensity) As Integer
     ''' returns the AFDRS FBI for mallee
     '''
     ''' args
@@ -178,8 +163,8 @@ Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, Intensit
                     fbi_ua = fbi_b(2)
                     fbi_la = fbi_b(1)
                 Case Is >= 0.66
-                    param = Intensity
-                    Select Case Intensity
+                    param = intensity
+                    Select Case intensity
                         Case Is < 20000 'category 4
                             param_ua = 20000
                             param_la = 0
@@ -208,3 +193,25 @@ Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, Intensit
     FBI_mallee = fbi_la + (fbi_ua - fbi_la) * (param - param_la) / (param_ua - param_la)
     FBI_mallee = Int(FBI_mallee) 'FBI needs to be truncated for National consistency
 End Function
+
+Public Sub update_from_LUT_Mallee()
+    Dim FTno As Single
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassMallee").Value, Range("MalleeLUT"), 2, False)
+    
+    Dim lut As String
+    lut = "AFDRS Fuel LUT"
+    Dim table As String
+    table = "AFDRS_LUT"
+    
+    If Range("State").Value = "NSWv402" Then
+        lut = "NSW_Fuel_v402_LUT"
+        table = "NSW_fuel_LUT"
+        fuel_sub_type = "AFDRS fuel type"
+    End If
+    
+    
+    Range("fl_s_mallee").Value = fuel_amount(LookupValueInTable(FTno, "FTno_State", "FL_s", lut, table), Range("tsf").Value, LookupValueInTable(FTno, "FTno_State", "Fk_s", lut, table))
+    Range("fl_o_mallee").Value = fuel_amount(LookupValueInTable(FTno, "FTno_State", "FL_o", lut, table), Range("tsf").Value, LookupValueInTable(FTno, "FTno_State", "Fk_o", lut, table))
+    Range("cov_o_mallee").Value = LookupValueInTable(FTno, "FTno_State", "Cov_o", lut, table)
+    Range("h_o_mallee").Value = LookupValueInTable(FTno, "FTno_State", "H_o", lut, table)
+End Sub

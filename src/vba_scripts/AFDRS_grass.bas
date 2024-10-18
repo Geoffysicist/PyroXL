@@ -48,10 +48,18 @@ Public Function ROS_grass(U_10, mc As Single, curing As Single, state As String)
     '''   curing: degree of grass curing (%)
     '''   state: grass state (natural, grazed, eaten-out)
     
-    Dim moist_coeff, curing_coeff As Single
+    Dim moist_coeff, curing_coeff, waf As Single
+    Dim FTno As Single
     
     curing_coeff = curing_coeff_grass(curing)
     moist_coeff = moist_coeff_grass(U_10, (mc))
+    waf = 1
+    
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassGrass").Value, Range("GrassLUT"), 2, False)
+    
+    If LookupValueInTable(FTno, "FTno_State", "Fuel_FDR", "AFDRS Fuel LUT", "AFDRS_LUT") = "Gamba" Then
+        waf = LookupValueInTable(FTno, "FTno_State", "WF_Sav", "AFDRS Fuel LUT", "AFDRS_LUT")
+    End If
     
     Select Case state
         Case "natural"
@@ -74,7 +82,7 @@ Public Function ROS_grass(U_10, mc As Single, curing As Single, state As String)
             End If
     End Select
     
-    ROS_grass = ROS_grass * 1000 * moist_coeff * curing_coeff
+    ROS_grass = ROS_grass * 1000 * moist_coeff * curing_coeff * waf
 End Function
 
 Public Function Flame_height_grass(ROS As Single, state As String) As Single
@@ -105,10 +113,16 @@ Public Function Intensity_grass(ByVal ROS As Double, ByVal fuel_load As Single) 
     '''   ROS: forward rate of spread (km/h)
     '''   fuel_load: fine fuel load (t/ha)
     
-    'limit fuel load to range 1 - 6
-    fuel_load = WorksheetFunction.Max(1, fuel_load)
-    fuel_load = WorksheetFunction.Min(6, fuel_load)
-    Intensity_grass = Intensity(ROS, fuel_load)
+    Dim FTno As Single
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassGrass").Value, Range("GrassLUT"), 2, False)
+    
+    If Not LookupValueInTable(FTno, "FTno_State", "Fuel_FDR", "AFDRS Fuel LUT", "AFDRS_LUT") = "Gamba" Then
+        'limit fuel load to range 1 - 6
+        fuel_load = WorksheetFunction.Max(1, fuel_load)
+        fuel_load = WorksheetFunction.Min(6, fuel_load)
+        Intensity_grass = intensity(ROS, fuel_load)
+    End If
+    
 End Function
 
 Public Function state_to_load_grass(state As String) As Single
@@ -116,15 +130,9 @@ Public Function state_to_load_grass(state As String) As Single
     '''
     ''' args
     '''   state: the grass fuel state - eaten-out, grazed or natural
-    
-    Select Case state
-        Case "natural"
-            state_to_load_grass = 6
-        Case "grazed"
-            state_to_load_grass = 4.5
-        Case "eaten-out"
-            state_to_load_grass = 1.5
-    End Select
+    state_to_load_grass = LookupValueInTable(state, "Grass State", "Fuel Load t/ha", "lookup_tables", "Table_grass_state")
+
+
 End Function
 
 Public Function load_to_state_grass(load As Single) As String
@@ -174,3 +182,29 @@ Public Function categorise_state_grass(state As Integer) As String
             categorise_state_grass = "eaten-out"
     End Select
 End Function
+
+Public Sub update_from_LUT_Grass()
+    Dim FTno As Single
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassGrass").Value, Range("GrassLUT"), 2, False)
+    
+    Dim lut As String
+    lut = "AFDRS Fuel LUT"
+    Dim table As String
+    table = "AFDRS_LUT"
+    Dim fuel_sub_type As String
+    fuel_sub_type = "Fuel_FDR"
+    
+    If Range("State").Value = "NSWv402" Then
+        lut = "NSW_Fuel_v402_LUT"
+        table = "NSW_fuel_LUT"
+        fuel_sub_type = "AFDRS fuel type"
+    End If
+    
+    Select Case LookupValueInTable(FTno, "FTno_State", fuel_sub_type, lut, table)
+        Case "Chenopod_shrubland", "Low_wetland"
+            Range("state_grass").Value = "eaten-out"
+        Case "Gamba"
+            Range("state_grass").Value = "natural"
+    End Select
+            
+End Sub

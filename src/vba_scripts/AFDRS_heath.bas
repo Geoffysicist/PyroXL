@@ -43,7 +43,21 @@ Public Function Mf_heath(mc As Double) As Double
     End Select
 End Function
 
-Public Function ROS_heath(U_10, h_el, mc As Double, overstorey As Boolean) As Double
+Public Function SI_heath(U_10, h_el, mc, waf) As Double
+    ''' returns Spread Index.
+    '''
+    ''' args
+    '''   U_10: 10 m wind speed (km/h)
+    '''   h_el: elevated fuel height (m)
+    '''   mc: fuel moisture content (%)
+    '''   waf: wind adjustment factor
+    
+    Dim U_2 As Double: U_2 = U_10 * waf
+    SI_heath = 2.57902560498943 + 0.175608738551563 * U_2 + 0.752448659028343 * h_el + 0.14916661946054 * h_el * U_2 - 0.430727111563859 * mc
+    SI_heath = exp(SI_heath) / (1 + exp(SI_heath))
+    
+End Function
+Public Function ROS_heath(U_10, h_el, mc As Double, SI, waf) As Double
     ''' returns forward rate of spread (m/h) [range: 0-6000 m/h]
     ''' Anderson, W. R., et al. (2015). "A generic, empirical-based model for predicting rate of fire
     ''' spread in shrublands." International Journal of Wildland Fire 24(4): 443-460.
@@ -53,26 +67,22 @@ Public Function ROS_heath(U_10, h_el, mc As Double, overstorey As Boolean) As Do
     '''   h_el: elevated fuel height (m)
     '''   mc: fuel moisture content (%)
     '''   overstorey: presence or absence of woodland overstorey (true/false)
+    '''   waf: wind adjustment factor
     
-    Dim mf As Double 'fuel moisture factor
-    mf = Mf_heath(mc)
+    Dim U_2 As Double: U_2 = U_10 * waf
+    Dim sqrt_U_2 As Double: sqrt_U_2 = Sqr(U_2)
+    'Dim SI As Double: SI = SI_heath(U2, h_el, mc)
     
-    'wrf depends on presence or absence of woodland overstorey
-    Dim wrf As Double: wrf = 0.667
-     
-    If overstorey = True Then
-        wrf = 0.35
-    End If
+    mc = mc / 100 'change to proportion
+    Dim fmc As Double: fmc = Log(mc / (1 - mc))
     
+    ROS_heath = 3.34696092119763 + 0.588661598397372 * sqrt_U_2 - 0.788551298241711 * fmc + 0.414992984575498 * Log(h_el)
     
-    ROS_heath = 5.6715 * (wrf * U_10) ^ 0.912 * h_el ^ 0.227 * mf * 60
-    
-    'apply go-nogo correction
-    ROS_heath = ROS_heath / (1 + exp(-0.4 * (wrf * U_10 - 20)))
-    ROS_heath = ROS_heath / (1 + exp(-0.4 * (12 - mc)))
+    ROS_heath = SI * exp(ROS_heath)
     
 End Function
-Public Function intensity_heath(ROS, fl_max, tsf, k) As Double
+
+Public Function intensity_heath(ROS, fuel_load) As Double
     ''' returns the fire line intensity (kW/m)
     '''
     ''' args
@@ -81,14 +91,11 @@ Public Function intensity_heath(ROS, fl_max, tsf, k) As Double
     '''   tsf: time since fire (y)
     '''   k: fuel accumulation curve constant
     
-    Dim fuel_load_ As Double
-    fuel_load_ = fl_max * (1 - exp(-1 * tsf * k)) 'fuel_load(fl_max, tsf, k)
-    
     'intensity_heath = intensity(ROS, fuel_load_)
-    intensity_heath = 18600 * (fuel_load_ / 10) * (ROS / 3600)
+    intensity_heath = 18600 * (fuel_load / 10) * (ROS / 3600)
 End Function
 
-Public Function Flame_height_heath(Intensity As Double) As Double
+Public Function Flame_height_heath(intensity As Double) As Double
     ''' returns flame height (m)
     ''' No equation for flame height was given in the Anderson et al. paper (2015).
     ''' Here we use the flame height calculation for mallee-heath shrublands (Cruz, M. G., et al. (2013).
@@ -98,5 +105,34 @@ Public Function Flame_height_heath(Intensity As Double) As Double
     ''' args
     '''   intensity: fire line intensity (kW/m)
     
-    Flame_height_heath = exp(-4.142) * Intensity ^ 0.633
+    Flame_height_heath = exp(-4.142) * intensity ^ 0.633
 End Function
+
+Public Sub update_from_LUT_Heath()
+    Dim FTno As Single
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassHeath").Value, Range("HeathLUT"), 2, False)
+    
+        Dim lut As String
+    lut = "AFDRS Fuel LUT"
+    Dim table As String
+    table = "AFDRS_LUT"
+    Dim fuel_sub_type As String
+    fuel_sub_type = "Fuel_FDR"
+    
+    If Range("State").Value = "NSWv402" Then
+        lut = "NSW_Fuel_v402_LUT"
+        table = "NSW_fuel_LUT"
+        fuel_sub_type = "AFDRS fuel type"
+    End If
+
+    
+    Select Case LookupValueInTable(FTno, "FTno_State", fuel_sub_type, lut, table)
+        Case "Heath", "Wet_heath" ' no diff in the models at this stage
+            Range("fl_heath").Value = fuel_amount(LookupValueInTable(FTno, "FTno_State", "FL_total", lut, table), Range("tsf").Value, LookupValueInTable(FTno, "FTno_State", "Fk_total", lut, table))
+    End Select
+    
+    Range("waf_heath").Value = LookupValueInTable(FTno, "FTno_State", "WF_Heath", lut, table)
+    Range("h_el_heath").Value = LookupValueInTable(FTno, "FTno_State", "H_el", lut, table)
+    
+            
+End Sub

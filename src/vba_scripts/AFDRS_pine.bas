@@ -104,11 +104,11 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
 
     net_fuel_load_IMP = fuel_load_IMP / (1 + mineral_content_total)
     
-    E = 0.715 * exp(-0.000359 * surface_volume_ratio)
+    e = 0.715 * exp(-0.000359 * surface_volume_ratio)
     b = 0.02562 * Power(surface_volume_ratio, 0.54)
     c = 7.47 * exp(-0.133 * Power(surface_volume_ratio, 0.55))
     packing_ratio_op = 3.348 * Power(surface_volume_ratio, -0.8189) 'Optimum packing ratio
-    wind_coefficient = c * Power(wind_mid_flame * 54.68, b) * Power(packing_ratio / packing_ratio_op, -E)
+    wind_coefficient = c * Power(wind_mid_flame * 54.68, b) * Power(packing_ratio / packing_ratio_op, -e)
 
     xi = Power(192 + 0.2595 * surface_volume_ratio, -1) * exp((0.792 * 0.681 * Power(surface_volume_ratio, 0.5)) * (packing_ratio + 0.1)) 'Propagating flux ratio
 
@@ -161,7 +161,7 @@ Public Function fire_behaviour_pine(U_10, mc, DF, KBDI, _
     'convert to m/h
     ROS = ROS * 3600
     Dim Intensity_total As Double
-    Intensity_total = Intensity(ROS, fuel_load)
+    Intensity_total = intensity(ROS, fuel_load)
     flame_height = 0.07755 * Power(Intensity_total, 0.46)
     
     If Active Then
@@ -212,7 +212,7 @@ Public Function fb_pine_ensemble(U_10, mc, DF, KBDI) As Variant()
     Dim wrf, ROS, Intensity_total, flame_height As Single
     wrf = 5
     ROS = ROS_grass(U_10, (mc), 100, "eaten-out")
-    Intensity_total = Intensity(ROS, 1.5) * grass_proportion
+    Intensity_total = intensity(ROS, 1.5) * grass_proportion
     flame_height = Flame_height_grass((ROS), "eaten-out") * grass_proportion
     ROS = ROS * grass_proportion
     
@@ -249,4 +249,7 @@ Public Function fb_pine_ensemble(U_10, mc, DF, KBDI) As Variant()
 End Function
 
 
+Public Sub update_from_LUT_Pine()
+    ' nothing to see here.
+End Sub
 

@@ -23,3 +23,9 @@ Public Function ROS_heath_raw(U_10, h_el, mc As Double, overstorey As Boolean) A
     
     ROS_heath = 5.6715 * (wrf * U_10) ^ 0.912 * h_el ^ 0.227 * mf * 60
 End Function
+
+
+
+Sub test()
+    Call update_from_LUT_Forest
+End Sub

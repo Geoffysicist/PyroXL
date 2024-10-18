@@ -131,13 +131,13 @@ Public Function cardinal_to_degrees(ByVal cardinal As String) As Single
         "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW" _
         )
     Dim degree_array() As Single
-    step = 360 / (UBound(cardinal_array) + 1) 'zero indexed array
+    Step = 360 / (UBound(cardinal_array) + 1) 'zero indexed array
     d = 0
     
     For i = 0 To UBound(cardinal_array)
         ReDim Preserve degree_array(i)
         degree_array(i) = d
-        d = d + step
+        d = d + Step
     Next i
     
     i = Application.Match(cardinal, cardinal_array, False) 'zero indexed array
@@ -159,5 +159,58 @@ Public Function backbearing(ByVal bearing As Variant) As Single
     Else
         backbearing = bearing - 180
     End If
+End Function
+
+Public Function breach_probability(ByVal intensity As Double, ByVal width As Single, Optional trees As Boolean = True) As Single
+    ''' returns the probability that a firebreak will be breached
+    ''' based on:
+    ''' Wilson, A. A. G. (2011). Width of firebreak that is necessary to stop grass fires: Some field experiments.
+    ''' Canadian Journal of Forest Research. https://doi.org/10.1139/x88-104
+    '''
+    ''' using logistic function described in:
+    ''' Frost, S. M., Alexander, M. E., & Jenkins, M. J. (2022). The Application of Fire Behavior Modeling
+    ''' to Fuel Treatment Assessments at Army Garrison Camp Williams, Utah.
+    '''
+    ''' args
+    '''   intensity: fireline intensity (kW/m)
+    '''   width: firebreak width (m)
+    '''   trees: presence or absence of trees
+    
+    Dim width_coeff As Single
+    If trees Then
+        width_coefficient = 0.38
+    Else
+        width_coefficient = 0.99
+    End If
+    
+    breach_probability = exp(1.36 + 0.00036 * intensity - width_coefficient * width) * 100
+    breach_probability = breach_probability / (1 + exp(1.36 + 0.00036 * intensity - width_coefficient * width))
+End Function
+
+Function LookupValueInTable(lookupValue As Variant, lookupColumnName As String, returnColumnName As String, sheetName As String, tableName As String) As Variant
+    Dim ws As Worksheet
+    Dim tbl As ListObject
+    Dim result As Variant
+    Dim i As Long
+
+    ' Set the worksheet and table
+    Set ws = ThisWorkbook.Sheets(sheetName)
+    Set tbl = ws.ListObjects(tableName)
+
+    ' Initialize result as not found
+    result = "Not found"
+
+    ' Loop through each row in the table
+    For i = 1 To tbl.ListRows.Count
+        ' Check if the value in the lookup column matches the lookup value
+        If tbl.DataBodyRange.Cells(i, tbl.ListColumns(lookupColumnName).Index).Value = lookupValue Then
+            ' Get the corresponding value from the return column
+            result = tbl.DataBodyRange.Cells(i, tbl.ListColumns(returnColumnName).Index).Value
+            Exit For
+        End If
+    Next i
+
+    ' Return the result
+    LookupValueInTable = result
 End Function
 

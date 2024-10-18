@@ -1,5 +1,5 @@
 Attribute VB_Name = "AFDRS_woodland"
-Public Function ROS_woodland(U_10, mc As Single, curing As Single, subtype As String, Optional fuel_load As Single = 4.5, Optional waf As Single = 0.5) As Single
+Public Function ROS_woodland(U_10, mc As Single, curing As Single, state As String, waf As Single) As Single
     ''' returns the forward ROS (m/h) ignoring slope
     ''' Based on:
     ''' Cheney, N. P., Gould, J. S., & Catchpole, W. R. (1998). Prediction of fire
@@ -15,23 +15,10 @@ Public Function ROS_woodland(U_10, mc As Single, curing As Single, subtype As St
     '''   mc: fuel moisture content (%)
     '''   curing: degree of grass curing (%)
     '''   subtype: woodland, acacia_woodland, woody_forticulture, rural, urban
-    '''   fuel_load: grass fuel load (1 - 12 t/ha)
+    '''   state: grass state (natural, eaten out, grazed)
     '''   WAF: wind adjustment factor
     
-    Dim state As String
-    
-    Select Case subtype
-        Case "acacia_woodland"
-            state = "eaten-out"
-        Case "woody_horticulture"
-            state = "eaten-out"
-        Case "rural"
-            state = "grazed"
-        Case "urban"
-            state = "eaten-out"
-        Case Else
-            state = load_to_state_grass(fuel_load)
-    End Select
+
     ROS_woodland = ROS_grass(U_10, mc, curing, state) * waf
 End Function
 
@@ -46,28 +33,15 @@ Public Function FMC_woodland(temp, rh As Single) As Single
     FMC_woodland = FMC_grass(temp, rh)
 End Function
 
-Public Function Flame_height_woodland(ROS As Single, fuel_load As Single, Optional submodel As String = "woodland") As Single
+Public Function Flame_height_woodland(ROS As Single, state As String) As Single
     ''' returns the flame height (m) based on M. Plucinski, pers. comm.
     ''' uses the grass model
     '''
     ''' args
     '''   ROS: forward rate of spread (m/h)
-    '''   load: the grass fuel load (t/ha)
+    '''   state: grass state (natural, eaten out, grazed)
     
-    Dim state As String
-    
-    Select Case subtype
-        Case "acacia_woodland"
-            state = "eaten-out"
-        Case "woody_horticulture"
-            state = "eaten-out"
-        Case "rural"
-            state = "grazed"
-        Case "urban"
-            state = "eaten-out"
-        Case Else
-            state = load_to_state_grass(fuel_load)
-    End Select
+
     Flame_height_woodland = Flame_height_grass(ROS, state)
 End Function
 
@@ -80,3 +54,34 @@ Public Function Intensity_woodland(ByVal ROS As Double, ByVal fuel_load As Singl
     
     Intensity_woodland = Intensity_grass(ROS, fuel_load)
 End Function
+
+Public Sub update_from_LUT_Woodland()
+    Dim FTno As Single
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassWoodland").Value, Range("WoodlandLUT"), 2, False)
+    
+    Dim lut As String
+    lut = "AFDRS Fuel LUT"
+    Dim table As String
+    table = "AFDRS_LUT"
+    Dim fuel_sub_type As String
+    fuel_sub_type = "Fuel_FDR"
+    
+    If Range("State").Value = "NSWv402" Then
+        lut = "NSW_Fuel_v402_LUT"
+        table = "NSW_fuel_LUT"
+        fuel_sub_type = "AFDRS fuel type"
+    End If
+    
+    
+    Select Case LookupValueInTable(FTno, "FTno_State", fuel_sub_type, lut, table)
+        Case "Acacia_woodland"
+            Range("state_woodland").Value = "eaten-out"
+        Case "Rural"
+            Range("state_woodland").Value = "grazed"
+        Case "Gamba"
+            Range("state_woodland").Value = "natural"
+    End Select
+    
+    Range("waf_woodland").Value = LookupValueInTable(FTno, "FTno_State", "WF_Sav", lut, table)
+            
+End Sub

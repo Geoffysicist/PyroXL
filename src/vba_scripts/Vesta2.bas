@@ -47,6 +47,7 @@ Public Function Mf_Vesta2(fmc As Single) As Single
     End Select
 End Function
 
+
 Public Function fuel_availability_Vesta2(DF, Optional DI = 100, Optional waf = 3, Optional submodel = "dry") As Double
     ''' returns the fuel availability - proportion of fuel available to be burnt
     '''
@@ -57,15 +58,16 @@ Public Function fuel_availability_Vesta2(DF, Optional DI = 100, Optional waf = 3
     '''   DI: drought index - KBDI except SDI in Tas
     '''   WAF: wind adjustment factor between 3 and 5
     '''   submodel: dry or wet
-    
+    SAF = 1
     If submodel = "wet" Then
-        C1 = (0.0046 * Power(waf, 2) - 0.0079 * waf - 0.0175) * DI + (-0.9167 * Power(waf, 2) + 1.5833 * waf + 13.5)
+        C1 = DI * (0.0046 * Power(waf, 2) - 0.0079 * waf - 0.175) - 0.9167 * Power(waf, 2) + 1.5833 * waf + 13.5
         C2 = 0 'TODO: implement slope/aspect effect
-        DF = DF * WorksheetFunction.Max(C1 + C2, 0) / 10
-        DF = WorksheetFunction.Min(DF, 10)
-        DF = WorksheetFunction.Max(DF, 0)
+        SAF = (C1 + C2) / 10
+        SAF = WorksheetFunction.Max(SAF, 0)
+        SAF = WorksheetFunction.Min(SAF, 1)
     End If
-    fuel_availability_Vesta2 = 1.008 / (1 + 104.9 * exp(-0.9306 * DF))
+    fuel_availability_Vesta2 = 1.008 / (1 + 104.9 * exp(-0.9306 * DF * SAF))
+        
 End Function
 
 Public Function fme_Vesta2(mf, fa) As Single
@@ -73,39 +75,51 @@ Public Function fme_Vesta2(mf, fa) As Single
     ''' Cruz 2021 Eq 8
     '''
     ''' args
-    '''   mf: fine dead fuel moicture content factor
+    '''   mf: fine dead fuel moisture content factor
     '''   fa: fuel availability
     
     fme_Vesta2 = mf * fa
 End Function
 
-Public Function prob_phase2(U_10, waf, fme, fls) As Single
+Public Function prob_phase2(U_10, waf, fls, fmc, fa) As Single
     ''' returns the probability of transition to phase 2
     ''' Cruz 2021 Eqn 9 and 10
     '''
     ''' args
     '''   U_10: 10m wind speed (km/h)
     '''   waf: wind adjustment factor between 3 and 5
-    '''   fme: fuel moisture effect function
     '''   fls: surface fuel load (t/ha)
+    '''   fmc: fine fule moisture content (%)
+    '''   fa: fuel availability
+    
+    u = U_10 / waf
+    
+    mf = Mf_Vesta2((fmc))
+    
+    fme = fme_Vesta2(mf, fa)
 
     Select Case fls
         Case Is < 1
             prob_phase2 = 0
         Case Else
-            g_x = -23.9315 + 1.7033 * U_10 / waf + 12.0822 * fme + 0.95236 * fls
+            g_x = -23.9315 + 1.7033 * u + 12.0822 * fme + 0.95236 * fls
             prob_phase2 = 1 / (1 + exp(-g_x))
     End Select
 End Function
 
-Public Function prob_phase3(U_10, ros2, fme) As Single
+Public Function prob_phase3(U_10, ros2, fmc, fa) As Single
     ''' returns the probability of transition to phase 2
     ''' Cruz 2021 Eqn 9 and 10
     '''
     ''' args
     '''   U_10: 10m wind speed (km/h)
     '''   ros2: phase 2 rate of spread km/h
-    '''   fme: fuel moisture effect function
+    '''   fmc: fine fule moisture content (%)
+    '''   fa: fuel availability
+    
+    mf = Mf_Vesta2((fmc))
+    
+    fme = fme_Vesta2(mf, fa)
 
 
     Select Case ros2
@@ -133,7 +147,7 @@ Public Function sf_Vesta2(slope) As Single
     End Select
 End Function
 
-Public Function ros1_Vesta2(U_10, waf, fls, fme, sf) As Single
+Public Function ros1_Vesta2(U_10, waf, fls, fmc, fa, Optional sf = 1) As Single
     ''' returns the phase 1 forwards rate of spread (km/h)
     ''' Cruz 2021 eqn 14a and b
     '''
@@ -141,18 +155,25 @@ Public Function ros1_Vesta2(U_10, waf, fls, fme, sf) As Single
     '''   U_10: 10m wind speed (km/h)
     '''   waf: wind adjustment factor between 3 and 5
     '''   fls: surface fuel load (t/ha)
-    '''   fuel moisture effect
-    '''   slope factor    u = U_10 / waf
+    '''   fmc: fine fule moisture content (%)
+    '''   fa: fuel availability
+    '''   slope factor
+    
+    u = U_10 / waf
+    
+    mf = Mf_Vesta2((fmc))
+    
+    fme = fme_Vesta2(mf, fa)
     
     If u > 2 Then
         ros1_Vesta2 = 0.03 + 0.05024 * Power(u - 1, 0.92628) * Power(fls / 10, 0.79928)
     Else
         ros1_Vesta2 = 0.03
     End If
-    ros1_Vesta2 = ros1_Vesta2 * fme * sf
+    ros1_Vesta2 = 1000 * ros1_Vesta2 * fme * sf
 End Function
 
-Public Function ros2_Vesta2(U_10, waf, fls, h_u, fme, sf) As Single
+Public Function ros2_Vesta2(U_10, waf, fls, h_u, fmc, fa, Optional sf = 1) As Single
     ''' returns the phase 2 forwards rate of spread (km/h)
     ''' Cruz 2021 eqn 15
     '''
@@ -161,25 +182,36 @@ Public Function ros2_Vesta2(U_10, waf, fls, h_u, fme, sf) As Single
     '''   waf: wind adjustment factor between 3 and 5
     '''   fls: surface fuel load (t/ha)
     '''   h_u: average understorey height (m)
-    '''   fuel moisture effect
+    '''   fmc: fine fule moisture content (%)
+    '''   fa: fuel availability
     '''   slope factor
     
+    mf = Mf_Vesta2((fmc))
+    
+    fme = fme_Vesta2(mf, fa)
+ 
     u = U_10 / waf
     ros2_Vesta2 = 0.19591 * Power(u, 0.8257) * Power(fls / 10, 0.4672) * Power(h_u, 0.495)
-    ros2_Vesta2 = ros2_Vesta2 * fme * sf
+    ros2_Vesta2 = 1000 * ros2_Vesta2 * fme * sf
+
 End Function
 
-Public Function ros3_Vesta2(U_10, waf, fls, h_u, fme, sf) As Single
+Public Function ros3_Vesta2(U_10, fmc, fa, Optional sf = 1) As Single
     ''' returns the phase 2 forwards rate of spread (km/h)
     ''' Cruz 2021 eqn 16
     '''
     ''' args
     '''   U_10: 10m wind speed (km/h)
-    '''   fuel moisture effect
+    '''   fmc: fine fule moisture content (%)
+    '''   fa: fuel availability
     '''   slope factor
     
+    mf = Mf_Vesta2((fmc))
+    
+    fme = fme_Vesta2(mf, fa)
+    
     ros3_Vesta2 = 0.05235 * Power(U_10, 1.19128)
-    ros3_Vesta2 = ros3_Vesta2 * fme * sf
+    ros3_Vesta2 = 1000 * ros3_Vesta2 * fme * sf
 End Function
 
 Public Function ros_Vesta2(ros1, ros2, ros3, p2, p3) As Single

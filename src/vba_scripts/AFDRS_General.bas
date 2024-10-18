@@ -1,46 +1,128 @@
 Attribute VB_Name = "AFDRS_General"
 Public Sub set_defaults()
-    Range("current_date").Value = Date 'date (formatted)
-    Range("current_time").Value = time 'time (formatted)
-    Range("date_row1").Value = Date 'date (formatted)
-    Range("time_row1").Value = time 'time (formatted)
-    Range("temp_row1").Value = 25 'temp
-    Range("rh_row1").Value = 30 'RH
-    Range("wind_dir_row1").Value = "N" 'wind direction
-    Range("wind_mag_row1").Value = 20 'wind speed
-    Range("kbdi").Value = 100 'KBDI
-    Range("tsf").Value = 20 'Time since fire
-    Range("df_row1").Value = 8 'DF
-    Range("waf_forest").Value = 3 'WAF Forest
-    Range("h_ns_forest").Value = 20 'forest h_ns
-    Range("h_e_forest").Value = 2 'forest h_el
-    Range("h_o_forest").Value = 20 'forest h_o
-    Range("fl_s_forest").Value = 10 'forest surface fuel load
-    Range("fl_ns_forest").Value = 3.5 'forest fl_ns
-    Range("fl_e_forest").Value = 2 'forest fl_e
-    Range("fl_b_forest").Value = 2 'forest fl_b
-    Range("fl_o_forest").Value = 4.5 'forest fl_o
-    Range("submodel_forest").Value = "dry" 'submodel_forest
-    Range("state_grass").Value = "grazed" 'grass state
-    Range("curing_grass").Value = 80 'grass curing
-    Range("subtype_woodland").Value = "woodland" 'woodland subtype
-    Range("fl_woodland").Value = 4.5 'woodland grass fuel load
-    Range("curing_woodland").Value = 80 'grass curing
-    Range("waf_woodland").Value = 0.5 'woodland wind adjustment factor
-    Range("overstorey_heath").Value = False 'heath presence of overstorey
-    Range("h_el_heath").Value = 2 'elevated fuel height
-    'Range("tsf_heath").Value = 25 'heath  time since fire
-    Range("fl_s_mallee").Value = 3 'mallee fl_s
-    Range("fl_o_mallee").Value = 1 'mallee fl_o
-    Range("cov_o_mallee").Value = 18 'mallee Cov_o
-    Range("h_o_mallee").Value = 4.5 'mallee H_o
-    Range("AWAP_uf").Value = 0 'soil moisture factor
-    Range("productivity_spinifex").Value = 1 'arid = 1, low rainfall = 2, high rainfall = 3
-    Range("subtype_spinifex").Value = "open" 'spinifex subtype
-    Range("productivity_buttongrass").Value = 1 'low = 1, high rainfall = 2
+    For Each class In Array("Forest", "Grass", "Woodland", "Heath", "Pine", "Mallee", "Spinifex", "Buttongrass")
+        Range("Class" & class).Value = "default"
+    Next class
+    
+    set_defaults_Other
+    
 End Sub
 
-Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest") As Single
+Public Sub set_defaults_Forest()
+
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "fl_b_forest", "FL_b_forest"
+    param_dict.Add "fl_e_forest", "FL_e_forest"
+    param_dict.Add "fl_ns_forest", "FL_ns_forest"
+    param_dict.Add "fl_o_forest", "FL_o_forest"
+    param_dict.Add "fl_s_forest", "FL_s_forest"
+    param_dict.Add "fhs_s", "FHS_s_forest"
+    param_dict.Add "fhs_ns", "FHS_ns_forest"
+    param_dict.Add "h_e_forest", "H_el_forest"
+    param_dict.Add "h_ns_forest", "H_ns_forest"
+    param_dict.Add "h_o_forest", "H_o_forest"
+    param_dict.Add "waf_forest", "WRF_forest"
+    param_dict.Add "submodel_forest", "submodel_forest"
+    
+    set_defaults_from_LUT param_dict
+
+End Sub
+
+Public Sub set_defaults_Grass()
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "curing_grass", "curing"
+    param_dict.Add "state_grass", "state"
+    
+    set_defaults_from_LUT param_dict
+
+End Sub
+
+Public Sub set_defaults_Woodland()
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "state_woodland", "state"
+    param_dict.Add "curing_woodland", "curing"
+    param_dict.Add "waf_woodland", "WF_Sav"
+    
+    set_defaults_from_LUT param_dict
+    
+End Sub
+
+Public Sub set_defaults_Buttongrass()
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "productivity_buttongrass", "Prod_BG"
+    
+    set_defaults_from_LUT param_dict
+    
+End Sub
+
+Public Sub set_defaults_Heath()
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "waf_heath", "WF_Heath"
+    param_dict.Add "h_el_heath", "H_el_heath"
+    param_dict.Add "fl_heath", "FL_heath"
+    
+    set_defaults_from_LUT param_dict
+
+End Sub
+
+Public Sub set_defaults_Mallee()
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "cov_o_mallee", "Cov_o_mallee"
+    param_dict.Add "fl_o_mallee", "FL_o_mallee"
+    param_dict.Add "fl_s_mallee", "FL_s_mallee"
+    param_dict.Add "h_o_mallee", "H_o_mallee"
+    
+    set_defaults_from_LUT param_dict
+
+End Sub
+
+Public Sub set_defaults_Spinifex()
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "subtype_spinifex", "submodel_spinifex"
+    param_dict.Add "waf_spinifex", "WF_spinifex"
+    
+    set_defaults_from_LUT param_dict
+
+End Sub
+
+Public Sub set_defaults_Pine()
+
+End Sub
+
+Public Sub set_defaults_Other()
+    Dim param_dict As Object
+    Set param_dict = CreateObject("Scripting.Dictionary")
+    param_dict.Add "AWAP_uf", "AWAP"
+    param_dict.Add "temp_row1", "temp"
+    param_dict.Add "rh_row1", "RH"
+    param_dict.Add "wind_dir_row1", "wind_direction"
+    param_dict.Add "wind_mag_row1", "U_10"
+    param_dict.Add "kbdi", "KBDI"
+    param_dict.Add "tsf", "tsf"
+    param_dict.Add "df_row1", "DF"
+    param_dict.Add "rain", "rain"
+    param_dict.Add "tsr", "tsr"
+    
+    set_defaults_from_LUT param_dict
+
+End Sub
+
+Public Sub set_defaults_from_LUT(param_dict As Object)
+    Dim param As Variant
+    For Each param In param_dict.Keys
+        Range(param).Value = LookupValueInTable(param_dict(param), "parameter", "value", "lookup_tables", "Default_Values")
+    Next param
+End Sub
+
+
+Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
     '''  returns FBI.
     '''
     ''' args
@@ -69,7 +151,8 @@ Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest
         Case "grass"
             intensity_b = Array(0, 100, 3000, 9000, 17500, 25000) 'intensity_b and fbi_b must have same dimensions
         Case "heath"
-            intensity_b = Array(0, 50, 500, 4000, 20000, 40000) 'intensity_b and fbi_b must have same dimensions
+            'actually uses ROS (m/h) but uses the same process so for simplicity label it here as intensity
+            intensity_b = Array(0, 1250, 2300, 3800, 7000, 14000)
         Case "savannah", "woodland"
             intensity_b = Array(0, 100, 3000, 9000, 17500, 25000) 'intensity_b and fbi_b must have same dimensions
         Case "pine"
@@ -84,7 +167,7 @@ Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest
     End Select
     
     'determine FBI
-    Select Case Intensity
+    Select Case intensity
         Case Is < intensity_b(0)
             FBI = -9999
             Exit Function
@@ -95,7 +178,7 @@ Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest
             fbi_la = fbi_b(UBound(fbi_b))
         Case Else
             For i = 1 To UBound(intensity_b)
-                If Intensity < intensity_b(i) Then
+                If intensity < intensity_b(i) Then
                     fbi_la = fbi_b(i - 1)
                     fbi_ua = fbi_b(i)
                     intensity_la = intensity_b(i - 1)
@@ -105,12 +188,12 @@ Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest
             Next i
     End Select
     
-    FBI = fbi_la + (fbi_ua - fbi_la) * (Intensity - intensity_la) / (intensity_ua - intensity_la)
+    FBI = fbi_la + (fbi_ua - fbi_la) * (intensity - intensity_la) / (intensity_ua - intensity_la)
     FBI = Int(FBI) 'FBI needs to be truncated for National consistency
 
 End Function
 
-Public Function Intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
+Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
     ''' returns the fireline intensity (kW/m) based on Byram 1959
     '''
     ''' args
@@ -121,7 +204,7 @@ Public Function Intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Dou
     ROS = ROS / 3600 'm/s
     fuel_load = fuel_load / 10 'kg/m^2
     
-    Intensity = 18600 * ROS * fuel_load
+    intensity = 18600 * ROS * fuel_load
 End Function
 
 Public Function fuel_amount(fuel_param_max, tsf, k) As Double
@@ -132,7 +215,7 @@ Public Function fuel_amount(fuel_param_max, tsf, k) As Double
     '''   tsf: time since fire (y)
     '''   k: fuel accumulation curve parameter
     
-    fuel_amount = fuel_param_max * (1 - exp(-1 * tsf * k))
+    fuel_amount = Round(fuel_param_max * (1 - exp(-1 * tsf * k)), 1)
 End Function
 
 Public Function fl_to_fhs(layer As String, fuel_load As Single)
@@ -179,22 +262,264 @@ Public Function dewpoint(temp, rh) As Single
 
     Gamma = Log((rh / 100) * exp((b - temp / d) * (temp / (c + temp))))
     dewpoint = c * Gamma / (b - Gamma)
-    'dewpoint = 42
+
 End Function
 
-Public Function point(temp, rh) As Single
-    ''' returns the dew point temperature based on the Magnus formula with the the Arden Buck modification
+Public Function vp_deficit(air_temperature, relative_humidity) As Single
+    ''' returns the vapour pressure deficit in hPa, calculated using Tetens (1930)
     '''
     ''' args
     '''   temp: air temperature (C)
     '''   rh: relative humidity (%)
-
-    a = 6.1121 'hPa
-    b = 18.678
-    c = 257.14 '°C
-    d = 234.5 '°C
-
-    Gamma = Log((rh / 100) * exp((b - temp / d) * (temp / (c + temp))))
-    point = c * Gamma / (b - Gamma)
-    'dewpoint = 42
+    
+    Dim es, ea As Double
+    es = 610.78 / 1000 * exp((17.269 * air_temperature) / (237.3 + air_temperature))
+    ea = (relative_humidity * es / 100)
+    
+    vp_deficit = es - ea
 End Function
+
+Public Sub ListAFDRSClasses(lower As Single, upper As Single)
+    ''' create list of AFDRS classes based on FTno range
+    
+    Dim ws_LUT As Worksheet 'AFDRS LUT worksheet
+    Dim ws_List As Worksheet 'worksheet to contain lists
+    Dim ws_spreadModels As Worksheet 'ROS and FB worksheet
+    Dim lut As ListObject
+    Dim rng As Range
+    Dim cell As Range
+    Dim fuelClass As Variant
+
+    Dim fuelClassList As Collection
+    Dim FTno_List As Collection
+    ' Dim dropdownCell As Range
+    Dim item As Variant
+    Dim ctr As Long
+    
+    ' Set the worksheet and table
+    Set ws_LUT = ThisWorkbook.Sheets("AFDRS Fuel LUT")
+    Set ws_List = ThisWorkbook.Sheets("lookup_tables")
+    Set ws_spreadModels = ThisWorkbook.Sheets("SpreadModels")
+    Set lut = ws_LUT.ListObjects("AFDRS_LUT")
+    
+    ' Initialize the collection to store filtered items
+    Set fuelClassList = New Collection
+    Set FTno_List = New Collection
+    
+    
+    ' dictionary to loop through fuel types and models
+    Dim fuelClassDict As Object
+    Set fuelClassDict = CreateObject("Scripting.Dictionary")
+    
+    ' Add items to the dictionary
+    fuelClassDict.Add "Forest", Array("Forest", "Wet_forest")
+    fuelClassDict.Add "Grass", Array("Chenopod_shrubland", "Crop", "Grass", "Low_wetland", "Pasture")
+    fuelClassDict.Add "Woodland", Array("Acacia_woodland", "Gamba", "Rural", "Urban", "Woodland", "Woody_horticulture")
+    fuelClassDict.Add "Buttongrass", Array("Buttongrass")
+    fuelClassDict.Add "Heath", Array("Heath", "Wet_heath")
+    fuelClassDict.Add "Mallee", Array("Mallee")
+    fuelClassDict.Add "Pine", Array("Pine")
+    fuelClassDict.Add "Spinifex", Array("Spinifex", "Spinifex_woodland")
+    
+    For Each fuelClass In fuelClassDict.Keys
+        ' Empty the collections
+        Do While fuelClassList.Count > 0
+            fuelClassList.Remove 1
+        Loop
+        
+        Do While FTno_List.Count > 0
+            FTno_List.Remove 1
+        Loop
+        
+        'add default values
+        fuelClassList.Add "default"
+        FTno_List.Add 9999
+    
+        ' Loop through the table and filter based on criteria
+        For Each cell In lut.ListColumns("Fuel_Name").DataBodyRange
+            ' If cell.Offset(0, 1).Value = fuelClassDict(fuelClass) And
+            If Not IsError(Application.Match(cell.Offset(0, 2).Value, fuelClassDict(fuelClass), 0)) And _
+               cell.Offset(0, 3).Value >= lower And _
+               cell.Offset(0, 3).Value < upper Then
+                On Error Resume Next
+                fuelClassList.Add cell.Value
+                FTno_List.Add cell.Offset(0, 3).Value
+                On Error GoTo 0
+            End If
+        Next cell
+        
+        ' Debug: Check if fuelclassList is empty
+        'If fuelClassList.Count = 0 Then
+        '    MsgBox "No items found in the filtered list.", vbExclamation
+        '    Exit Sub
+        'End If
+        
+        ' Clear the entire column before setting the validation range
+        Range("Classes_" & fuelClass).ClearContents
+        Range("FTno_" & fuelClass).ClearContents
+        
+        ' Place the filtered list in a range
+        ' On Error Resume Next
+        ' Set validationRange = ws_List.Range("V2").Resize(fuelclassList.Count)
+        Set validationRange = Range("Classes_" & fuelClass)
+        Set FTno_Range = Range("FTno_" & fuelClass)
+        
+        'If Err.Number <> 0 Then
+        '    MsgBox "Error setting validation range: " & Err.Description, vbCritical
+        '    Exit Sub
+        'End If
+        'On Error GoTo 0
+        
+        ctr = 1
+        For Each item In fuelClassList
+            validationRange.Cells(ctr, 1).Value = item
+            ctr = ctr + 1
+        Next item
+        
+        ctr = 1
+        For Each item In FTno_List
+            FTno_Range.Cells(ctr, 1).Value = item
+            ctr = ctr + 1
+        Next item
+
+        ' Add data validation
+        Range("Class" & fuelClass).Value = validationRange.Cells(1, 1).Value
+        With Range("Class" & fuelClass).Validation ' Replace with the cell or range where you want to apply validation
+            .Delete
+            .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
+                xlBetween, Formula1:="='" & ws_List.Name & "'!" & validationRange.Address
+            .IgnoreBlank = True
+            .InCellDropdown = True
+            .ShowInput = True
+            .ShowError = True
+        End With
+        
+
+    Next fuelClass
+
+End Sub
+
+Public Sub ListNSWClasses(Optional lower = 0, Optional upper = 76)
+    ''' create list of AFDRS classes based on FTno range
+    
+    Dim ws_LUT As Worksheet 'AFDRS LUT worksheet
+    Dim ws_List As Worksheet 'worksheet to contain lists
+    Dim ws_spreadModels As Worksheet 'ROS and FB worksheet
+    Dim lut As ListObject
+    Dim rng As Range
+    Dim cell As Range
+    Dim fuelClass As Variant
+
+    Dim fuelClassList As Collection
+    Dim FTno_List As Collection
+    ' Dim dropdownCell As Range
+    Dim item As Variant
+    Dim ctr As Long
+    
+    ' Set the worksheet and table
+    Set ws_LUT = ThisWorkbook.Sheets("NSW_Fuel_v402_LUT")
+    Set ws_List = ThisWorkbook.Sheets("lookup_tables")
+    Set ws_spreadModels = ThisWorkbook.Sheets("SpreadModels")
+    Set lut = ws_LUT.ListObjects("NSW_fuel_LUT")
+    
+    ' Initialize the collection to store filtered items
+    Set fuelClassList = New Collection
+    Set FTno_List = New Collection
+    
+    
+    ' dictionary to loop through fuel types and models
+    Dim fuelClassDict As Object
+    Set fuelClassDict = CreateObject("Scripting.Dictionary")
+    
+    ' Add items to the dictionary
+    fuelClassDict.Add "Forest", Array("Forest", "Wet_forest")
+    fuelClassDict.Add "Grass", Array("Chenopod_shrubland", "Crop", "Grass", "Low_wetland", "Pasture")
+    fuelClassDict.Add "Woodland", Array("Acacia_woodland", "Arid_woodland", "Rural", "Urban", "Woodland", "Woody_horticulture")
+    fuelClassDict.Add "Buttongrass", Array("Buttongrass")
+    fuelClassDict.Add "Heath", Array("Heath", "Wet_heath")
+    fuelClassDict.Add "Mallee", Array("Mallee")
+    fuelClassDict.Add "Pine", Array("Pine")
+    fuelClassDict.Add "Spinifex", Array("Spinifex", "Spinifex woodland")
+    
+    For Each fuelClass In fuelClassDict.Keys
+        ' Empty the collections
+        Do While fuelClassList.Count > 0
+            fuelClassList.Remove 1
+        Loop
+        
+        Do While FTno_List.Count > 0
+            FTno_List.Remove 1
+        Loop
+        
+        'add default values
+        fuelClassList.Add "default"
+        FTno_List.Add 9999
+    
+        ' Loop through the table and filter based on criteria
+        For Each cell In lut.ListColumns("Fuel name").DataBodyRange
+            ' If cell.Offset(0, 1).Value = fuelClassDict(fuelClass) And
+            If Not IsError(Application.Match(cell.Offset(0, 2).Value, fuelClassDict(fuelClass), 0)) And _
+               cell.Offset(0, -2).Value >= lower And _
+               cell.Offset(0, -2).Value <= upper Then
+                On Error Resume Next
+                fuelClassList.Add cell.Value
+                FTno_List.Add cell.Offset(0, -2).Value
+                On Error GoTo 0
+            End If
+        Next cell
+        
+        ' Debug: Check if fuelclassList is empty
+        'If fuelClassList.Count = 0 Then
+        '    MsgBox "No items found in the filtered list.", vbExclamation
+        '    Exit Sub
+        'End If
+        
+        ' Clear the entire column before setting the validation range
+        Range("Classes_" & fuelClass).ClearContents
+        Range("FTno_" & fuelClass).ClearContents
+        
+        ' Place the filtered list in a range
+        ' On Error Resume Next
+        ' Set validationRange = ws_List.Range("V2").Resize(fuelclassList.Count)
+        Set validationRange = Range("Classes_" & fuelClass)
+        Set FTno_Range = Range("FTno_" & fuelClass)
+        
+        'If Err.Number <> 0 Then
+        '    MsgBox "Error setting validation range: " & Err.Description, vbCritical
+        '    Exit Sub
+        'End If
+        'On Error GoTo 0
+        
+        ctr = 1
+        For Each item In fuelClassList
+            validationRange.Cells(ctr, 1).Value = item
+            ctr = ctr + 1
+        Next item
+        
+        ctr = 1
+        For Each item In FTno_List
+            FTno_Range.Cells(ctr, 1).Value = item
+            ctr = ctr + 1
+        Next item
+
+        ' Add data validation
+        Range("Class" & fuelClass).Value = validationRange.Cells(1, 1).Value
+        With Range("Class" & fuelClass).Validation ' Replace with the cell or range where you want to apply validation
+            .Delete
+            .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
+                xlBetween, Formula1:="='" & ws_List.Name & "'!" & validationRange.Address
+            .IgnoreBlank = True
+            .InCellDropdown = True
+            .ShowInput = True
+            .ShowError = True
+        End With
+        
+
+    Next fuelClass
+
+End Sub
+
+Public Sub test()
+    ListNSWClasses
+End Sub
+

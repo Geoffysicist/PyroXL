@@ -57,13 +57,13 @@ Public Function ROS_buttongrass(U_10, mc, tsf, productivity) As Single
     End If
 End Function
 
-Public Function Flame_height_buttongrass(Intensity) As Single
+Public Function Flame_height_buttongrass(intensity) As Single
     ''' returns the flame height (m) based on M. Plucinski, pers. comm.
     '''
     ''' args
     '''   intensity: fireline intensity (kW/m)
     
-    Flame_height_buttongrass = 0.148 * Power(Intensity, 0.403)
+    Flame_height_buttongrass = 0.148 * Power(intensity, 0.403)
 End Function
 
 Public Function Intensity_buttongrass(ByVal ROS As Double, ByVal fuel_load As Single) As Double
@@ -79,3 +79,10 @@ Public Function Intensity_buttongrass(ByVal ROS As Double, ByVal fuel_load As Si
     
     Intensity_buttongrass = 19900 * ROS * fuel_load
 End Function
+
+Public Sub update_from_LUT_Buttongrass()
+    Dim FTno As Single
+    FTno = Application.WorksheetFunction.VLookup(Range("ClassButtongrass").Value, Range("ButtongrassLUT"), 2, False)
+
+    Range("productivity_buttongrass").Value = LookupValueInTable(FTno, "FTno_State", "Prod_BG", "AFDRS Fuel LUT", "AFDRS_LUT")
+End Sub
