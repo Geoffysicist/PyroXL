@@ -35,7 +35,7 @@
        wind_speed: 10 m wind speed(km/h)
        fuel_moisture: dead fuel moisture content (%)
 
-### Public Function ROS_mallee(wind_speed, fuel_moisture, overstorey_cover, overstorey_height) As Double
+### Public Function ROS_mallee(wind_speed, fuel_moisture, overstorey_cover, overstorey_height, spread_probability, crown_probability) As Double
      return rate of spread (m/h) [Range = 0 - 8000].
      Based on: Cruz, M. G., et al. (2013). "Fire behaviour modelling in semi-arid
      mallee-heath shrublands of southern Australia." Environmental Modelling & Software 40: 21-34.
@@ -45,7 +45,7 @@
        overstorey_cover: (%)
        overstorey_height: (m)
 
-### Public Function fuel_load_mallee( _
+### Public Function fuel_load_mallee(fuel_load_surface, fuel_load_canopy, crown_probability) As Double
      return fuel load based on crown probability.
      if fuel loads are know don't pass the k values as arguments
      if k values passed then use exponetial decay model to adjust fuel for age (fuel build-up).
@@ -53,19 +53,18 @@
      and decomposers in ecological systems. Ecology, 44(2), 322-331.
      Include canopy fuel based on crown_probability (Cruz pers. comm.).
      args
-       wind_speed: 10 m wind speed(km/h)
-       fuel_moisture: dead fuel moisture content (%)
-       fuel_load_surface: maximum surface fuel load (t/ha)
-       fuel_load_canopy: maximum canopy fuel load (t/ha)
-       k_surface: surface fuel accumulation constant
-       k_canopy: canopy fuel accumulation constant
+       fuel_load_surface: surface fuel load (t/ha)
+       fuel_load_canopy: canopy fuel load (t/ha)
+       crown_probability: crown probability %
 
-### Public Function flame_height_mallee(Intensity) As Double
+### Public Function flame_height_mallee(intensity) As Double
 
-### Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, Intensity) As Integer
+### Public Function FBI_mallee(wind_speed, fuel_moisture, overstorey_cover, intensity) As Integer
      returns the AFDRS FBI for mallee
      args
        wind_speed: 10 m wind speed(km/h)
        fuel_moisture: dead fuel moisture content (%)
        overstorey_cover: (%)
        intensity: fire line intensity (kW/m)
+
+### Public Sub update_from_LUT_Mallee()

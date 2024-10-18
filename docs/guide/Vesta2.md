@@ -26,25 +26,27 @@
      returns the fuel moisture effect function
      Cruz 2021 Eq 8
      args
-       mf: fine dead fuel moicture content factor
+       mf: fine dead fuel moisture content factor
        fa: fuel availability
 
-### Public Function prob_phase2(U_10, waf, fme, fls) As Single
+### Public Function prob_phase2(U_10, waf, fls, fmc, fa) As Single
      returns the probability of transition to phase 2
      Cruz 2021 Eqn 9 and 10
      args
        U_10: 10m wind speed (km/h)
        waf: wind adjustment factor between 3 and 5
-       fme: fuel moisture effect function
        fls: surface fuel load (t/ha)
+       fmc: fine fule moisture content (%)
+       fa: fuel availability
 
-### Public Function prob_phase3(U_10, ros2, fme) As Single
+### Public Function prob_phase3(U_10, ros2, fmc, fa) As Single
      returns the probability of transition to phase 2
      Cruz 2021 Eqn 9 and 10
      args
        U_10: 10m wind speed (km/h)
        ros2: phase 2 rate of spread km/h
-       fme: fuel moisture effect function
+       fmc: fine fule moisture content (%)
+       fa: fuel availability
 
 ### Public Function sf_Vesta2(slope) As Single
      returns the slope function
@@ -52,17 +54,18 @@
      Kataburn down slope effect refinement from Sullivan et al. (2014)
      Cruz 2021 eqn 13
 
-### Public Function ros1_Vesta2(U_10, waf, fls, fme, sf) As Single
+### Public Function ros1_Vesta2(U_10, waf, fls, fmc, fa, Optional sf = 1) As Single
      returns the phase 1 forwards rate of spread (km/h)
      Cruz 2021 eqn 14a and b
      args
        U_10: 10m wind speed (km/h)
        waf: wind adjustment factor between 3 and 5
        fls: surface fuel load (t/ha)
-       fuel moisture effect
-       slope factor    u = U_10 / waf
+       fmc: fine fule moisture content (%)
+       fa: fuel availability
+       slope factor
 
-### Public Function ros2_Vesta2(U_10, waf, fls, h_u, fme, sf) As Single
+### Public Function ros2_Vesta2(U_10, waf, fls, h_u, fmc, fa, Optional sf = 1) As Single
      returns the phase 2 forwards rate of spread (km/h)
      Cruz 2021 eqn 15
      args
@@ -70,15 +73,17 @@
        waf: wind adjustment factor between 3 and 5
        fls: surface fuel load (t/ha)
        h_u: average understorey height (m)
-       fuel moisture effect
+       fmc: fine fule moisture content (%)
+       fa: fuel availability
        slope factor
 
-### Public Function ros3_Vesta2(U_10, waf, fls, h_u, fme, sf) As Single
+### Public Function ros3_Vesta2(U_10, fmc, fa, Optional sf = 1) As Single
      returns the phase 2 forwards rate of spread (km/h)
      Cruz 2021 eqn 16
      args
        U_10: 10m wind speed (km/h)
-       fuel moisture effect
+       fmc: fine fule moisture content (%)
+       fa: fuel availability
        slope factor
 
 ### Public Function ros_Vesta2(ros1, ros2, ros3, p2, p3) As Single

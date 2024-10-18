@@ -57,3 +57,5 @@
      returns an categorical value of the grass fuel state
      args
        state: the grass fuel state - 1=eaten-out, 2=grazed or 3=natural
+
+### Public Sub update_from_LUT_Grass()

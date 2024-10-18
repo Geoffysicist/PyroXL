@@ -47,3 +47,5 @@
        mc: dead fuel moisture content %
        DF: drought factor
        KBDI: Keetch Byram drought index KBDI
+
+### Public Sub update_from_LUT_Pine()

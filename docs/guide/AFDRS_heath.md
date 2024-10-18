@@ -19,7 +19,15 @@
      args
        mc: fuel moisture content (%)
 
-### Public Function ROS_heath(U_10, h_el, mc As Double, overstorey As Boolean) As Double
+### Public Function SI_heath(U_10, h_el, mc, waf) As Double
+     returns Spread Index.
+     args
+       U_10: 10 m wind speed (km/h)
+       h_el: elevated fuel height (m)
+       mc: fuel moisture content (%)
+       waf: wind adjustment factor
+
+### Public Function ROS_heath(U_10, h_el, mc As Double, SI, waf) As Double
      returns forward rate of spread (m/h) [range: 0-6000 m/h]
      Anderson, W. R., et al. (2015). "A generic, empirical-based model for predicting rate of fire
      spread in shrublands." International Journal of Wildland Fire 24(4): 443-460.
@@ -28,8 +36,9 @@
        h_el: elevated fuel height (m)
        mc: fuel moisture content (%)
        overstorey: presence or absence of woodland overstorey (true/false)
+       waf: wind adjustment factor
 
-### Public Function intensity_heath(ROS, fl_max, tsf, k) As Double
+### Public Function intensity_heath(ROS, fuel_load) As Double
      returns the fire line intensity (kW/m)
      args
        ROS: forward rate of spread (m/h)
@@ -37,7 +46,7 @@
        tsf: time since fire (y)
        k: fuel accumulation curve constant
 
-### Public Function Flame_height_heath(Intensity As Double) As Double
+### Public Function Flame_height_heath(intensity As Double) As Double
      returns flame height (m)
      No equation for flame height was given in the Anderson et al. paper (2015).
      Here we use the flame height calculation for mallee-heath shrublands (Cruz, M. G., et al. (2013).
@@ -45,3 +54,5 @@
      Environmental Modelling & Software 40: 21-34).
      args
        intensity: fire line intensity (kW/m)
+
+### Public Sub update_from_LUT_Heath()

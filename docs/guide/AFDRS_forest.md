@@ -59,3 +59,5 @@
        DI: drought indes - KBDI except SDI in Tas
        WAF: wind adjustment factor
        submodel: dry or wet
+
+### Public Sub update_from_LUT_Forest(Optional loads_only As Boolean = False)

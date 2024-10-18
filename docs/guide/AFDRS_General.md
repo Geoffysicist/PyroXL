@@ -2,13 +2,33 @@
 
 ### Public Sub set_defaults()
 
-### Public Function FBI(ByVal Intensity As Double, Optional fuel As String = "forest") As Single
+### Public Sub set_defaults_Forest()
+
+### Public Sub set_defaults_Grass()
+
+### Public Sub set_defaults_Woodland()
+
+### Public Sub set_defaults_Buttongrass()
+
+### Public Sub set_defaults_Heath()
+
+### Public Sub set_defaults_Mallee()
+
+### Public Sub set_defaults_Spinifex()
+
+### Public Sub set_defaults_Pine()
+
+### Public Sub set_defaults_Other()
+
+### Public Sub set_defaults_from_LUT(param_dict As Object)
+
+### Public Function FBI(ByVal intensity As Double, Optional fuel As String = "forest") As Single
       returns FBI.
      args
        intensity: file line intensity (kW/m)
        fuel: the fuel type
 
-### Public Function Intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
+### Public Function intensity(ByVal ROS As Double, ByVal fuel_load As Single) As Double
      returns the fireline intensity (kW/m) based on Byram 1959
      args
        ROS: forward rate of spread (km/h)
@@ -33,8 +53,16 @@
        temp: air temperature (C)
        rh: relative humidity (%)
 
-### Public Function point(temp, rh) As Single
-     returns the dew point temperature based on the Magnus formula with the the Arden Buck modification
+### Public Function vp_deficit(air_temperature, relative_humidity) As Single
+     returns the vapour pressure deficit in hPa, calculated using Tetens (1930)
      args
        temp: air temperature (C)
        rh: relative humidity (%)
+
+### Public Sub ListAFDRSClasses(lower As Single, upper As Single)
+     create list of AFDRS classes based on FTno range
+
+### Public Sub ListNSWClasses(Optional lower = 0, Optional upper = 76)
+     create list of AFDRS classes based on FTno range
+
+### Public Sub test()
