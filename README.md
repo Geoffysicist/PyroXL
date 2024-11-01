@@ -1,7 +1,7 @@
 # PyroXL
 Fire Behaviour Analysis Excel VBA Scripts
 
-## PyroXL_AFDRS spreadsheet
+## PyroXL spreadsheet
 The original intent of this spreadsheet was to implement the Australian Fire Danger Rating System models in Excel.  
 All AFDRS models are tested against the python scripts that underlie AFDRS.
 
