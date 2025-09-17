@@ -43,7 +43,7 @@ Public Function FMC_spinifex(AWAP_uf, time_since_fire, relative_humidity, air_te
     Dim dead, live, pct_dead As Single
     
     pct_dead = -4.0936696 + 0.8619864 * time_since_fire - 1.613603 * Log(time_since_fire) - 0.1739302 * time_since_fire * Log(time_since_fire)
-    pct_dead = (1 / (1 + exp(-pct_dead))) * 100 'TODO: check why this is not * 100, but the others are not - I have ammended
+    pct_dead = (1 / (1 + exp(-pct_dead))) * 100 'TODO: check why this is not * 100, but the others are - not I have ammended
     
     live = (0.419130229421894 + 0.158980195 * Sqr(AWAP_uf) - 0.271357085 * Sqr(fuel_cover) - 0.007380343 * vpd)
     live = (1 / (1 + exp(-live))) * 100

@@ -5,7 +5,7 @@ Public Function GFDI(U10, load, fmc) As Single
     '''   U_10: 10 m wind speed (km/h)
     '''   load: grass fuel load (t/ha)
     '''   fmc: fuel moisture content (%)
-
+    
     If fmc < 18.8 Then
         GFDI = 3.35 * load * exp(-0.0897 * fmc + 0.0403 * U10)
     ElseIf fmc >= 30 Then
@@ -50,15 +50,13 @@ Public Function Flame_height_forest_Mk5(ROS As Double, h_el As Single) As Single
     Flame_height_forest = 13 * ROS + 0.24 * load - 2
 End Function
 
-Public Function ffdi(temp, rh, DF, U10, Optional wrf = 3) As Single
+Public Function ffdi(temp, rh, DF, U10) As Single
     '''  returns McArthur Mk5 Forest Fire Danger Index from Noble et al. 1980.
     '''
     '''   temp: air temperature (C)
     '''   rh: relative humidity (%)
     '''   DF: drought factor
     '''   U_10: 10 m wind speed (km/h)
-    
-    U10 = U10 * 3 / wrf
     
     ffdi = 2 * exp(-0.45 + 0.987 * Log(DF) - 0.0345 * rh + 0.0338 * temp + 0.0234 * U10)
 

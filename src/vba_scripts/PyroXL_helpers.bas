@@ -149,6 +149,18 @@ Public Function cardinal_to_degrees(ByVal cardinal As String) As Single
     End If
 End Function
 
+Function degrees_to_cardinal(degrees As Single) As String
+    Dim cardinal_array As Variant
+    
+    cardinal_array = Array("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", _
+                           "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW")
+    
+    Dim index As Integer
+    index = Int((degrees / 22.5) + 0.5) Mod 16
+    
+    degrees_to_cardinal = cardinal_array(index)
+End Function
+
 Public Function backbearing(ByVal bearing As Variant) As Single
     If Not IsNumeric(bearing) Then
         bearing = cardinal_to_degrees(bearing)
@@ -183,8 +195,8 @@ Public Function breach_probability(ByVal intensity As Double, ByVal width As Sin
         width_coefficient = 0.99
     End If
     
-    breach_probability = exp(1.36 + 0.00036 * intensity - width_coefficient * width) * 100
-    breach_probability = breach_probability / (1 + exp(1.36 + 0.00036 * intensity - width_coefficient * width))
+    breach_probability = exp(1.36 + 0.00036 * intensity - width_coefficient * width)
+    breach_probability = 100 * breach_probability / (1 + breach_probability)
 End Function
 
 Function LookupValueInTable(lookupValue As Variant, lookupColumnName As String, returnColumnName As String, sheetName As String, tableName As String) As Variant
@@ -203,9 +215,9 @@ Function LookupValueInTable(lookupValue As Variant, lookupColumnName As String, 
     ' Loop through each row in the table
     For i = 1 To tbl.ListRows.Count
         ' Check if the value in the lookup column matches the lookup value
-        If tbl.DataBodyRange.Cells(i, tbl.ListColumns(lookupColumnName).Index).Value = lookupValue Then
+        If tbl.DataBodyRange.Cells(i, tbl.ListColumns(lookupColumnName).index).Value = lookupValue Then
             ' Get the corresponding value from the return column
-            result = tbl.DataBodyRange.Cells(i, tbl.ListColumns(returnColumnName).Index).Value
+            result = tbl.DataBodyRange.Cells(i, tbl.ListColumns(returnColumnName).index).Value
             Exit For
         End If
     Next i
